@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Industrial.Communication.DependencyInjection</PackageId>
+    <Description>Optional dependency-injection registration for industrial communication.</Description>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Communication.Adapters\Communication.Adapters.csproj" />
+    <ProjectReference Include="..\Communication.Protocols.Mc\Communication.Protocols.Mc.csproj" />
+    <ProjectReference Include="..\Communication.Protocols.Modbus\Communication.Protocols.Modbus.csproj" />
+    <ProjectReference Include="..\Communication.Protocols.OpcUa\Communication.Protocols.OpcUa.csproj" />
+    <ProjectReference Include="..\Communication.Protocols.S7\Communication.Protocols.S7.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+
+</Project>

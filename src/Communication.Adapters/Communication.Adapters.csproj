@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <PackageId>Industrial.Communication.Adapters</PackageId>
+    <Description>Device adapter building blocks for industrial communication.</Description>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Communication.Transports\Communication.Transports.csproj" />
+  </ItemGroup>
+
+</Project>

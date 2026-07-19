@@ -1,0 +1,49 @@
+# Public API baseline: Communication.Adapters
+# Update intentionally with tools/ApiSurface --write.
+
+public sealed class Communication.Adapters.BarcodeScannerAdapter : Communication.Adapters.FramedDeviceAdapter<string>, Communication.Abstractions.Interfaces.IBarcodeScanner, Communication.Abstractions.Interfaces.IDeviceAdapter, System.IAsyncDisposable
+  ctor(string deviceId, Communication.Abstractions.Interfaces.ITransportChannel channel, Communication.Abstractions.Interfaces.IFrameDecoder decoder, System.ReadOnlyMemory<byte> triggerCommand, System.Nullable<System.TimeSpan> duplicateWindow = null, System.Text.Encoding encoding = null)
+  event System.EventHandler<Communication.Abstractions.Models.BarcodeScannedEventArgs> BarcodeScanned
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> TriggerAsync(System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Adapters.DelegateDeviceAdapter : Communication.Adapters.DeviceAdapterBase, Communication.Abstractions.Interfaces.IDeviceAdapter, System.IAsyncDisposable
+  ctor(string deviceId, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult>> start, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult>> stop, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.DeviceHealth>> health = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.DeviceHealth> CheckHealthAsync(System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Adapters.DelegateDigitalIoAdapter : Communication.Adapters.DeviceAdapterBase, Communication.Abstractions.Interfaces.IDeviceAdapter, Communication.Abstractions.Interfaces.IDigitalIoDevice, System.IAsyncDisposable
+  ctor(string deviceId, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.DigitalIoSnapshot>>> read, System.Func<int, bool, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult>> write)
+  event System.EventHandler<Communication.Abstractions.Models.DigitalEdgeChangedEventArgs> InputChanged
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.DigitalIoSnapshot>> ReadStatusAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> SetOutputAsync(int index, bool value, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult>> SetOutputsAsync(System.Collections.Generic.IReadOnlyDictionary<int, bool> values, System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Adapters.DelegateFramedDeviceAdapter<TReading> : FramedDeviceAdapter<TReading>, Communication.Abstractions.Interfaces.IDeviceAdapter, System.IAsyncDisposable
+  ctor(string deviceId, Communication.Abstractions.Interfaces.ITransportChannel channel, Communication.Abstractions.Interfaces.IFrameDecoder decoder, Func<System.ReadOnlyMemory<byte>, CommunicationResult<TReading>> parser, Action<TReading, System.ReadOnlyMemory<byte>> onReading, int maxBufferedBytes = 1048576)
+
+public sealed class Communication.Adapters.DelegateMotionControllerAdapter : Communication.Adapters.DeviceAdapterBase, Communication.Abstractions.Interfaces.IDeviceAdapter, Communication.Abstractions.Interfaces.IMotionController, System.IAsyncDisposable
+  ctor(string deviceId, System.Func<int, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.AxisState>>> read, System.Func<int, bool, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult>> enable, System.Func<int, Communication.Abstractions.Models.MotionProfile, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult>> home, System.Func<int, double, Communication.Abstractions.Models.MotionProfile, bool, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult>> move, System.Func<int, Communication.Abstractions.Models.MotionStopMode, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult>> stopAxis)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.AxisState>> GetAxisStateAsync(int axis, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> HomeAsync(int axis, Communication.Abstractions.Models.MotionProfile profile = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> MoveAbsoluteAsync(int axis, double position, Communication.Abstractions.Models.MotionProfile profile, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> MoveRelativeAsync(int axis, double distance, Communication.Abstractions.Models.MotionProfile profile, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> SetEnabledAsync(int axis, bool enabled, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StopAxisAsync(int axis, Communication.Abstractions.Models.MotionStopMode mode = Communication.Abstractions.Models.MotionStopMode.Decelerated, System.Threading.CancellationToken cancellationToken = null)
+
+public abstract class Communication.Adapters.DeviceAdapterBase : Communication.Abstractions.Interfaces.IDeviceAdapter, System.IAsyncDisposable
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StartAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StopAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.DeviceHealth> CheckHealthAsync(System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+  property Communication.Abstractions.Models.DeviceHealth Health { get; }
+  property string DeviceId { get; }
+
+public abstract class Communication.Adapters.FramedDeviceAdapter<TReading> : Communication.Adapters.DeviceAdapterBase, Communication.Abstractions.Interfaces.IDeviceAdapter, System.IAsyncDisposable
+
+public sealed class Communication.Adapters.WeighingDeviceAdapter : Communication.Adapters.FramedDeviceAdapter<Communication.Abstractions.Models.WeightReading>, Communication.Abstractions.Interfaces.IDeviceAdapter, Communication.Abstractions.Interfaces.IWeighingDevice, System.IAsyncDisposable
+  ctor(string deviceId, Communication.Abstractions.Interfaces.ITransportChannel channel, Communication.Abstractions.Interfaces.IFrameDecoder decoder, System.Func<System.ReadOnlyMemory<byte>, Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.WeightReading>> parser, System.ReadOnlyMemory<byte> tareCommand, System.ReadOnlyMemory<byte> zeroCommand)
+  event System.EventHandler<Communication.Abstractions.Models.WeightReportedEventArgs> WeightReported
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.WeightReading>> ReadWeightAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> TareAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ZeroAsync(System.Threading.CancellationToken cancellationToken = null)
+

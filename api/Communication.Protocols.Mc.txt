@@ -1,0 +1,113 @@
+# Public API baseline: Communication.Protocols.Mc
+# Update intentionally with tools/ApiSurface --write.
+
+public sealed class Communication.Protocols.Mc.Codecs.Mc3ECodec : Communication.Abstractions.Interfaces.IProtocolCodec<Communication.Protocols.Mc.Models.McRequest, Communication.Protocols.Mc.Models.McResponse>
+  ctor(Communication.Protocols.Mc.Models.McClientOptions options = null)
+  method Communication.Abstractions.Interfaces.ProtocolDecodeResult<Communication.Protocols.Mc.Models.McResponse> TryDecode(System.Buffers.ReadOnlySequence<byte> buffer)
+  method System.ReadOnlyMemory<byte> Encode(Communication.Protocols.Mc.Models.McRequest request)
+  static method Communication.Abstractions.Interfaces.ProtocolDecodeResult<Communication.Protocols.Mc.Models.McRequest> TryDecodeRequest(System.Buffers.ReadOnlySequence<byte> buffer)
+  static method Communication.Abstractions.Interfaces.ProtocolDecodeResult<Communication.Protocols.Mc.Models.McResponse> TryDecodeResponse(System.Buffers.ReadOnlySequence<byte> buffer)
+  static method System.ReadOnlyMemory<byte> EncodeRequest(Communication.Protocols.Mc.Models.McRequest request, Communication.Protocols.Mc.Models.McClientOptions options = null)
+  static method System.ReadOnlyMemory<byte> EncodeResponse(Communication.Protocols.Mc.Models.McResponse response, Communication.Protocols.Mc.Models.McClientOptions options = null)
+
+public interface Communication.Protocols.Mc.IMcDataAccess : System.IAsyncDisposable
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.ReadOnlyMemory<byte>>> ReadAsync(Communication.Protocols.Mc.Models.McAddress address, ushort points, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteAsync(Communication.Protocols.Mc.Models.McAddress address, ushort points, System.ReadOnlyMemory<byte> data, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public sealed class Communication.Protocols.Mc.Mc3ETcpDataAccess : Communication.Protocols.Mc.IMcDataAccess, System.IAsyncDisposable
+  ctor(Communication.Abstractions.Interfaces.ITransportChannel channel, Communication.Protocols.Mc.Models.McClientOptions options = null, Communication.Core.Reliability.CommunicationClientOptions clientOptions = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.ReadOnlyMemory<byte>>> ReadAsync(Communication.Protocols.Mc.Models.McAddress address, ushort points, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteAsync(Communication.Protocols.Mc.Models.McAddress address, ushort points, System.ReadOnlyMemory<byte> data, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public sealed class Communication.Protocols.Mc.McAddressParser : Communication.Abstractions.Interfaces.IAddressParser
+  ctor()
+  method Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.PlcAddress> Parse(string address)
+  method Communication.Abstractions.Models.CommunicationResult<Communication.Protocols.Mc.Models.McAddress> ParseMc(string address)
+
+public sealed class Communication.Protocols.Mc.McPlcClient : Communication.Abstractions.Interfaces.IPlcClient, System.IAsyncDisposable
+  ctor(Communication.Protocols.Mc.IMcDataAccess access, Communication.Protocols.Mc.Models.McClientOptions options = null, Communication.Protocols.Mc.McAddressParser parser = null, Communication.Abstractions.Interfaces.IValueConverter converter = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.VariableValue>> ReadAsync(Communication.Abstractions.Models.VariableDefinition variable, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteAsync(Communication.Abstractions.Models.PlcWriteRequest request, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.VariableValue>>> ReadAsync(System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.VariableDefinition> variables, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult>> WriteAsync(System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.PlcWriteRequest> requests, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public sealed class Communication.Protocols.Mc.Models.McAddress : System.IEquatable<Communication.Protocols.Mc.Models.McAddress>
+  ctor(Communication.Protocols.Mc.Models.McDeviceCode DeviceCode, int DeviceNumber, string Original)
+  method Communication.Protocols.Mc.Models.McAddress <Clone>$()
+  method bool Equals(Communication.Protocols.Mc.Models.McAddress other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out Communication.Protocols.Mc.Models.McDeviceCode DeviceCode, out int DeviceNumber, out string Original)
+  property Communication.Protocols.Mc.Models.McDeviceCode DeviceCode { get; set; }
+  property bool IsBitDevice { get; }
+  property int DeviceNumber { get; set; }
+  property string Original { get; set; }
+
+public sealed class Communication.Protocols.Mc.Models.McClientOptions : System.IEquatable<Communication.Protocols.Mc.Models.McClientOptions>
+  ctor()
+  method Communication.Protocols.Mc.Models.McClientOptions <Clone>$()
+  method bool Equals(Communication.Protocols.Mc.Models.McClientOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property byte MultidropStationNumber { get; set; }
+  property byte NetworkNumber { get; set; }
+  property byte StationNumber { get; set; }
+  property int MaxBitPoints { get; set; }
+  property int MaxWordPoints { get; set; }
+  property ushort ModuleIoNumber { get; set; }
+
+public enum Communication.Protocols.Mc.Models.McDeviceCode : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Protocols.Mc.Models.McDeviceCode D = 168
+  static field Communication.Protocols.Mc.Models.McDeviceCode M = 144
+  static field Communication.Protocols.Mc.Models.McDeviceCode W = 180
+  static field Communication.Protocols.Mc.Models.McDeviceCode X = 156
+  static field Communication.Protocols.Mc.Models.McDeviceCode Y = 157
+
+public sealed class Communication.Protocols.Mc.Models.McRequest : System.IEquatable<Communication.Protocols.Mc.Models.McRequest>
+  ctor(Communication.Protocols.Mc.Models.McAddress Address, ushort Points, bool IsWrite, System.ReadOnlyMemory<byte> Data, ushort MonitoringTimer = 16)
+  method Communication.Protocols.Mc.Models.McRequest <Clone>$()
+  method bool Equals(Communication.Protocols.Mc.Models.McRequest other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out Communication.Protocols.Mc.Models.McAddress Address, out ushort Points, out bool IsWrite, out System.ReadOnlyMemory<byte> Data, out ushort MonitoringTimer)
+  property Communication.Protocols.Mc.Models.McAddress Address { get; set; }
+  property System.ReadOnlyMemory<byte> Data { get; set; }
+  property bool IsWrite { get; set; }
+  property ushort MonitoringTimer { get; set; }
+  property ushort Points { get; set; }
+
+public sealed class Communication.Protocols.Mc.Models.McResponse : System.IEquatable<Communication.Protocols.Mc.Models.McResponse>
+  ctor(ushort EndCode, System.ReadOnlyMemory<byte> Data)
+  method Communication.Protocols.Mc.Models.McResponse <Clone>$()
+  method bool Equals(Communication.Protocols.Mc.Models.McResponse other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out ushort EndCode, out System.ReadOnlyMemory<byte> Data)
+  property System.ReadOnlyMemory<byte> Data { get; set; }
+  property bool IsSuccess { get; }
+  property ushort EndCode { get; set; }
+
+public sealed class Communication.Protocols.Mc.Simulator.McMemoryDataAccess : Communication.Protocols.Mc.IMcDataAccess, System.IAsyncDisposable
+  ctor()
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.ReadOnlyMemory<byte>>> ReadAsync(Communication.Protocols.Mc.Models.McAddress address, ushort points, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteAsync(Communication.Protocols.Mc.Models.McAddress address, ushort points, System.ReadOnlyMemory<byte> data, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+

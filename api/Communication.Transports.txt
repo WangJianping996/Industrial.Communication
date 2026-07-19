@@ -1,0 +1,110 @@
+# Public API baseline: Communication.Transports
+# Update intentionally with tools/ApiSurface --write.
+
+public sealed class Communication.Transports.Options.SerialTransportOptions : System.IEquatable<Communication.Transports.Options.SerialTransportOptions>
+  ctor()
+  method Communication.Transports.Options.SerialTransportOptions <Clone>$()
+  method bool Equals(Communication.Transports.Options.SerialTransportOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.IO.Ports.Handshake Handshake { get; set; }
+  property System.IO.Ports.Parity Parity { get; set; }
+  property System.IO.Ports.StopBits StopBits { get; set; }
+  property System.TimeSpan OpenTimeout { get; set; }
+  property System.TimeSpan ReadTimeout { get; set; }
+  property System.TimeSpan WriteTimeout { get; set; }
+  property int BaudRate { get; set; }
+  property int DataBits { get; set; }
+  property int ReceiveBufferSize { get; set; }
+  property string PortName { get; set; }
+
+public sealed class Communication.Transports.Options.TcpServerOptions : System.IEquatable<Communication.Transports.Options.TcpServerOptions>
+  ctor()
+  method Communication.Transports.Options.TcpServerOptions <Clone>$()
+  method bool Equals(Communication.Transports.Options.TcpServerOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property bool NoDelay { get; set; }
+  property int MaxConnections { get; set; }
+  property int Port { get; set; }
+  property int ReceiveBufferSize { get; set; }
+  property int RequestQueueCapacity { get; set; }
+  property string ListenAddress { get; set; }
+
+public sealed class Communication.Transports.Options.TcpTransportOptions : System.IEquatable<Communication.Transports.Options.TcpTransportOptions>
+  ctor()
+  method Communication.Transports.Options.TcpTransportOptions <Clone>$()
+  method bool Equals(Communication.Transports.Options.TcpTransportOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.TimeSpan ConnectTimeout { get; set; }
+  property bool NoDelay { get; set; }
+  property int Port { get; set; }
+  property int ReceiveBufferSize { get; set; }
+  property int SendBufferSize { get; set; }
+  property string Host { get; set; }
+
+public sealed class Communication.Transports.Options.UdpTransportOptions : System.IEquatable<Communication.Transports.Options.UdpTransportOptions>
+  ctor()
+  method Communication.Transports.Options.UdpTransportOptions <Clone>$()
+  method bool Equals(Communication.Transports.Options.UdpTransportOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.Nullable<int> RemotePort { get; set; }
+  property bool EnableBroadcast { get; set; }
+  property int LocalPort { get; set; }
+  property int ReceiveBufferSize { get; set; }
+  property string LocalAddress { get; set; }
+  property string RemoteHost { get; set; }
+
+public sealed class Communication.Transports.Serial.SerialTransportChannel : Communication.Abstractions.Interfaces.ITransportChannel, System.IAsyncDisposable
+  ctor(Communication.Transports.Options.SerialTransportOptions options, string channelId = null)
+  event System.EventHandler<Communication.Abstractions.Models.ConnectionStateChangedEventArgs> StateChanged
+  method System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>> ReceiveAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<int>> SendAsync(System.ReadOnlyMemory<byte> payload, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+  property string ChannelId { get; }
+
+public sealed class Communication.Transports.Tcp.TcpCommunicationServer : Communication.Abstractions.Interfaces.ICommunicationServer, System.IAsyncDisposable
+  ctor(Communication.Transports.Options.TcpServerOptions options)
+  event System.EventHandler<Communication.Abstractions.Models.ConnectionStateChangedEventArgs> StateChanged
+  method System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.ServerRequestContext> ReadRequestsAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<int>> SendAsync(string sessionId, System.ReadOnlyMemory<byte> payload, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectSessionAsync(string sessionId, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StartAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StopAsync(System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+  property System.Collections.Generic.IReadOnlyCollection<Communication.Abstractions.Models.CommunicationSession> Sessions { get; }
+  property int BoundPort { get; }
+
+public sealed class Communication.Transports.Tcp.TcpTransportChannel : Communication.Abstractions.Interfaces.ITransportChannel, System.IAsyncDisposable
+  ctor(Communication.Transports.Options.TcpTransportOptions options, string channelId = null)
+  event System.EventHandler<Communication.Abstractions.Models.ConnectionStateChangedEventArgs> StateChanged
+  method System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>> ReceiveAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<int>> SendAsync(System.ReadOnlyMemory<byte> payload, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+  property string ChannelId { get; }
+
+public sealed class Communication.Transports.Udp.UdpTransportChannel : Communication.Abstractions.Interfaces.ITransportChannel, System.IAsyncDisposable
+  ctor(Communication.Transports.Options.UdpTransportOptions options, string channelId = null)
+  event System.EventHandler<Communication.Abstractions.Models.ConnectionStateChangedEventArgs> StateChanged
+  method System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>> ReceiveAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<int>> SendAsync(System.ReadOnlyMemory<byte> payload, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+  property int BoundPort { get; }
+  property string ChannelId { get; }
+

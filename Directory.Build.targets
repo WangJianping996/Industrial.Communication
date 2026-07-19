@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup Condition="'$(IsPackable)' != 'false'">
+    <Title Condition="'$(Title)' == ''">$(PackageId)</Title>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl Condition="'$(RepositoryUrl)' == '' and '$(GITHUB_REPOSITORY)' != ''">https://github.com/$(GITHUB_REPOSITORY)</RepositoryUrl>
+    <PackageProjectUrl Condition="'$(PackageProjectUrl)' == '' and '$(RepositoryUrl)' != ''">$(RepositoryUrl)</PackageProjectUrl>
+    <WarningsAsErrors>$(WarningsAsErrors);CS1591</WarningsAsErrors>
+  </PropertyGroup>
+</Project>

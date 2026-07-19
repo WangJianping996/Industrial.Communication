@@ -1,0 +1,194 @@
+# Public API baseline: Communication.Protocols.OpcUa
+# Update intentionally with tools/ApiSurface --write.
+
+public interface Communication.Protocols.OpcUa.IOpcUaSession : System.IAsyncDisposable
+  event System.EventHandler Reconnected
+  event System.EventHandler<Communication.Protocols.OpcUa.Models.OpcUaSecurityWarningEventArgs> SecurityWarning
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Protocols.OpcUa.IOpcUaSessionSubscription>> SubscribeAsync(System.Collections.Generic.IReadOnlyList<Communication.Protocols.OpcUa.Models.OpcUaMonitoredNode> nodes, System.TimeSpan publishingInterval, System.Func<Communication.Protocols.OpcUa.Models.OpcUaNodeValue, System.Threading.Tasks.ValueTask> onValue, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.Collections.Generic.IReadOnlyList<Communication.Protocols.OpcUa.Models.OpcUaEndpointDescription>>> DiscoverAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult<Communication.Protocols.OpcUa.Models.OpcUaNodeValue>>> ReadAsync(System.Collections.Generic.IReadOnlyList<string> nodeIds, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult>> WriteAsync(System.Collections.Generic.IReadOnlyList<Communication.Protocols.OpcUa.Models.OpcUaNodeWrite> writes, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public interface Communication.Protocols.OpcUa.IOpcUaSessionSubscription : System.IAsyncDisposable
+
+public sealed class Communication.Protocols.OpcUa.Models.OpcUaCertificateOptions : System.IEquatable<Communication.Protocols.OpcUa.Models.OpcUaCertificateOptions>
+  ctor()
+  method Communication.Protocols.OpcUa.Models.OpcUaCertificateOptions <Clone>$()
+  method bool Equals(Communication.Protocols.OpcUa.Models.OpcUaCertificateOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property bool AllowUntrustedCertificates { get; set; }
+  property bool AutoCreateApplicationCertificate { get; set; }
+  property bool ValidateCertificateHost { get; set; }
+  property string ApplicationCertificateStorePath { get; set; }
+  property string RejectedCertificateStorePath { get; set; }
+  property string TrustedIssuerStorePath { get; set; }
+  property string TrustedPeerStorePath { get; set; }
+
+public sealed class Communication.Protocols.OpcUa.Models.OpcUaConnectionOptions : System.IEquatable<Communication.Protocols.OpcUa.Models.OpcUaConnectionOptions>
+  ctor()
+  method Communication.Protocols.OpcUa.Models.OpcUaConnectionOptions <Clone>$()
+  method bool Equals(Communication.Protocols.OpcUa.Models.OpcUaConnectionOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property Communication.Protocols.OpcUa.Models.OpcUaCertificateOptions Certificates { get; set; }
+  property Communication.Protocols.OpcUa.Models.OpcUaIdentityOptions Identity { get; set; }
+  property Communication.Protocols.OpcUa.Models.OpcUaMessageSecurityMode SecurityMode { get; set; }
+  property Communication.Protocols.OpcUa.Models.OpcUaSecurityPolicy SecurityPolicy { get; set; }
+  property System.TimeSpan ReconnectDelay { get; set; }
+  property System.TimeSpan SessionTimeout { get; set; }
+  property string ApplicationName { get; set; }
+  property string ApplicationUri { get; set; }
+  property string EndpointUrl { get; set; }
+
+public sealed class Communication.Protocols.OpcUa.Models.OpcUaEndpointDescription : System.IEquatable<Communication.Protocols.OpcUa.Models.OpcUaEndpointDescription>
+  ctor(string EndpointUrl, Communication.Protocols.OpcUa.Models.OpcUaMessageSecurityMode SecurityMode, string SecurityPolicyUri, byte SecurityLevel, System.Collections.Generic.IReadOnlyList<Communication.Protocols.OpcUa.Models.OpcUaIdentityKind> SupportedIdentities)
+  method Communication.Protocols.OpcUa.Models.OpcUaEndpointDescription <Clone>$()
+  method bool Equals(Communication.Protocols.OpcUa.Models.OpcUaEndpointDescription other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out string EndpointUrl, out Communication.Protocols.OpcUa.Models.OpcUaMessageSecurityMode SecurityMode, out string SecurityPolicyUri, out byte SecurityLevel, out System.Collections.Generic.IReadOnlyList<Communication.Protocols.OpcUa.Models.OpcUaIdentityKind> SupportedIdentities)
+  property Communication.Protocols.OpcUa.Models.OpcUaMessageSecurityMode SecurityMode { get; set; }
+  property System.Collections.Generic.IReadOnlyList<Communication.Protocols.OpcUa.Models.OpcUaIdentityKind> SupportedIdentities { get; set; }
+  property byte SecurityLevel { get; set; }
+  property string EndpointUrl { get; set; }
+  property string SecurityPolicyUri { get; set; }
+
+public enum Communication.Protocols.OpcUa.Models.OpcUaIdentityKind : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Protocols.OpcUa.Models.OpcUaIdentityKind Anonymous = 0
+  static field Communication.Protocols.OpcUa.Models.OpcUaIdentityKind Certificate = 2
+  static field Communication.Protocols.OpcUa.Models.OpcUaIdentityKind UsernamePassword = 1
+
+public sealed class Communication.Protocols.OpcUa.Models.OpcUaIdentityOptions : System.IEquatable<Communication.Protocols.OpcUa.Models.OpcUaIdentityOptions>
+  ctor()
+  method Communication.Protocols.OpcUa.Models.OpcUaIdentityOptions <Clone>$()
+  method bool Equals(Communication.Protocols.OpcUa.Models.OpcUaIdentityOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property Communication.Protocols.OpcUa.Models.OpcUaIdentityKind Kind { get; set; }
+  property string CertificatePassword { get; set; }
+  property string CertificatePath { get; set; }
+  property string Password { get; set; }
+  property string Username { get; set; }
+
+public enum Communication.Protocols.OpcUa.Models.OpcUaMessageSecurityMode : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Protocols.OpcUa.Models.OpcUaMessageSecurityMode None = 0
+  static field Communication.Protocols.OpcUa.Models.OpcUaMessageSecurityMode Sign = 1
+  static field Communication.Protocols.OpcUa.Models.OpcUaMessageSecurityMode SignAndEncrypt = 2
+
+public sealed class Communication.Protocols.OpcUa.Models.OpcUaMonitoredNode : System.IEquatable<Communication.Protocols.OpcUa.Models.OpcUaMonitoredNode>
+  ctor(string NodeId, double SamplingIntervalMilliseconds = 250, uint QueueSize = 1)
+  method Communication.Protocols.OpcUa.Models.OpcUaMonitoredNode <Clone>$()
+  method bool Equals(Communication.Protocols.OpcUa.Models.OpcUaMonitoredNode other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out string NodeId, out double SamplingIntervalMilliseconds, out uint QueueSize)
+  property double SamplingIntervalMilliseconds { get; set; }
+  property string NodeId { get; set; }
+  property uint QueueSize { get; set; }
+
+public sealed class Communication.Protocols.OpcUa.Models.OpcUaNodeValue : System.IEquatable<Communication.Protocols.OpcUa.Models.OpcUaNodeValue>
+  ctor(string NodeId, object Value, Communication.Abstractions.Models.VariableQuality Quality, System.DateTimeOffset SourceTimestamp, System.DateTimeOffset ServerTimestamp, Communication.Abstractions.Models.CommunicationError Error = null)
+  method Communication.Protocols.OpcUa.Models.OpcUaNodeValue <Clone>$()
+  method bool Equals(Communication.Protocols.OpcUa.Models.OpcUaNodeValue other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out string NodeId, out object Value, out Communication.Abstractions.Models.VariableQuality Quality, out System.DateTimeOffset SourceTimestamp, out System.DateTimeOffset ServerTimestamp, out Communication.Abstractions.Models.CommunicationError Error)
+  property Communication.Abstractions.Models.CommunicationError Error { get; set; }
+  property Communication.Abstractions.Models.VariableQuality Quality { get; set; }
+  property System.DateTimeOffset ServerTimestamp { get; set; }
+  property System.DateTimeOffset SourceTimestamp { get; set; }
+  property object Value { get; set; }
+  property string NodeId { get; set; }
+
+public sealed class Communication.Protocols.OpcUa.Models.OpcUaNodeWrite : System.IEquatable<Communication.Protocols.OpcUa.Models.OpcUaNodeWrite>
+  ctor(string NodeId, object Value)
+  method Communication.Protocols.OpcUa.Models.OpcUaNodeWrite <Clone>$()
+  method bool Equals(Communication.Protocols.OpcUa.Models.OpcUaNodeWrite other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out string NodeId, out object Value)
+  property object Value { get; set; }
+  property string NodeId { get; set; }
+
+public enum Communication.Protocols.OpcUa.Models.OpcUaSecurityPolicy : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Protocols.OpcUa.Models.OpcUaSecurityPolicy Aes128Sha256RsaOaep = 2
+  static field Communication.Protocols.OpcUa.Models.OpcUaSecurityPolicy Aes256Sha256RsaPss = 3
+  static field Communication.Protocols.OpcUa.Models.OpcUaSecurityPolicy Basic256Sha256 = 1
+  static field Communication.Protocols.OpcUa.Models.OpcUaSecurityPolicy None = 0
+
+public sealed class Communication.Protocols.OpcUa.Models.OpcUaSecurityWarningEventArgs : System.EventArgs
+  ctor(string message)
+  property string Message { get; }
+
+public sealed class Communication.Protocols.OpcUa.Models.OpcUaSubscriptionOptions : System.IEquatable<Communication.Protocols.OpcUa.Models.OpcUaSubscriptionOptions>
+  ctor()
+  method Communication.Protocols.OpcUa.Models.OpcUaSubscriptionOptions <Clone>$()
+  method bool Equals(Communication.Protocols.OpcUa.Models.OpcUaSubscriptionOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.TimeSpan PublishingInterval { get; set; }
+  property System.TimeSpan SamplingInterval { get; set; }
+  property int UpdateQueueCapacity { get; set; }
+  property uint MonitoredItemQueueSize { get; set; }
+
+public sealed class Communication.Protocols.OpcUa.OpcFoundationSession : Communication.Protocols.OpcUa.IOpcUaSession, System.IAsyncDisposable
+  ctor(Communication.Protocols.OpcUa.Models.OpcUaConnectionOptions options)
+  event System.EventHandler Reconnected
+  event System.EventHandler<Communication.Protocols.OpcUa.Models.OpcUaSecurityWarningEventArgs> SecurityWarning
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Protocols.OpcUa.IOpcUaSessionSubscription>> SubscribeAsync(System.Collections.Generic.IReadOnlyList<Communication.Protocols.OpcUa.Models.OpcUaMonitoredNode> nodes, System.TimeSpan publishingInterval, System.Func<Communication.Protocols.OpcUa.Models.OpcUaNodeValue, System.Threading.Tasks.ValueTask> onValue, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.Collections.Generic.IReadOnlyList<Communication.Protocols.OpcUa.Models.OpcUaEndpointDescription>>> DiscoverAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult<Communication.Protocols.OpcUa.Models.OpcUaNodeValue>>> ReadAsync(System.Collections.Generic.IReadOnlyList<string> nodeIds, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult>> WriteAsync(System.Collections.Generic.IReadOnlyList<Communication.Protocols.OpcUa.Models.OpcUaNodeWrite> writes, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public sealed class Communication.Protocols.OpcUa.OpcUaClient : Communication.Abstractions.Interfaces.IPlcClient, System.IAsyncDisposable
+  ctor(Communication.Protocols.OpcUa.IOpcUaSession session)
+  event System.EventHandler<Communication.Protocols.OpcUa.Models.OpcUaSecurityWarningEventArgs> SecurityWarning
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.VariableValue>> ReadAsync(Communication.Abstractions.Models.VariableDefinition variable, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Protocols.OpcUa.OpcUaVariableSubscription>> SubscribeAsync(System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.VariableDefinition> variables, Communication.Protocols.OpcUa.Models.OpcUaSubscriptionOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.Collections.Generic.IReadOnlyList<Communication.Protocols.OpcUa.Models.OpcUaEndpointDescription>>> DiscoverAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteAsync(Communication.Abstractions.Models.PlcWriteRequest request, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.VariableValue>>> ReadAsync(System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.VariableDefinition> variables, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult>> WriteAsync(System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.PlcWriteRequest> requests, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public sealed class Communication.Protocols.OpcUa.OpcUaVariableSubscription : System.IAsyncDisposable
+  method System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.VariableValue> WatchAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  property int RestoreCount { get; }
+
+public sealed class Communication.Protocols.OpcUa.Simulator.MemoryOpcUaSession : Communication.Protocols.OpcUa.IOpcUaSession, System.IAsyncDisposable
+  ctor(Communication.Protocols.OpcUa.Models.OpcUaConnectionOptions options, System.Collections.Generic.IReadOnlyDictionary<string, object> initialValues = null)
+  event System.EventHandler Reconnected
+  event System.EventHandler<Communication.Protocols.OpcUa.Models.OpcUaSecurityWarningEventArgs> SecurityWarning
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask SetValueAsync(string nodeId, object value, Communication.Abstractions.Models.VariableQuality quality = Communication.Abstractions.Models.VariableQuality.Good, Communication.Abstractions.Models.CommunicationError error = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask SimulateReconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Protocols.OpcUa.IOpcUaSessionSubscription>> SubscribeAsync(System.Collections.Generic.IReadOnlyList<Communication.Protocols.OpcUa.Models.OpcUaMonitoredNode> nodes, System.TimeSpan publishingInterval, System.Func<Communication.Protocols.OpcUa.Models.OpcUaNodeValue, System.Threading.Tasks.ValueTask> onValue, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.Collections.Generic.IReadOnlyList<Communication.Protocols.OpcUa.Models.OpcUaEndpointDescription>>> DiscoverAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult<Communication.Protocols.OpcUa.Models.OpcUaNodeValue>>> ReadAsync(System.Collections.Generic.IReadOnlyList<string> nodeIds, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult>> WriteAsync(System.Collections.Generic.IReadOnlyList<Communication.Protocols.OpcUa.Models.OpcUaNodeWrite> writes, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+  property int ActiveSubscriptionCount { get; }
+  property int CreatedSubscriptionCount { get; }
+

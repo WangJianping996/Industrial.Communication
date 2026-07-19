@@ -1,0 +1,246 @@
+# Public API baseline: Communication.Core
+# Update intentionally with tools/ApiSurface --write.
+
+public sealed class Communication.Core.Checksums.Crc16Checksum : Communication.Abstractions.Interfaces.IChecksum
+  ctor(ushort polynomial = 40961, ushort initialValue = 65535, ushort finalXor = 0, bool littleEndianOutput = true)
+  method System.ReadOnlyMemory<byte> Compute(System.ReadOnlySpan<byte> payload)
+  method bool Validate(System.ReadOnlySpan<byte> payload, System.ReadOnlySpan<byte> expectedChecksum)
+  property bool LittleEndianOutput { get; }
+  property int Size { get; }
+  property ushort FinalXor { get; }
+  property ushort InitialValue { get; }
+  property ushort Polynomial { get; }
+
+public sealed class Communication.Core.Checksums.DelegatingChecksum : Communication.Abstractions.Interfaces.IChecksum
+  ctor(int size, System.Func<System.ReadOnlyMemory<byte>, System.ReadOnlyMemory<byte>> compute)
+  method System.ReadOnlyMemory<byte> Compute(System.ReadOnlySpan<byte> payload)
+  method bool Validate(System.ReadOnlySpan<byte> payload, System.ReadOnlySpan<byte> expectedChecksum)
+  property int Size { get; }
+
+public sealed class Communication.Core.Checksums.LrcChecksum : Communication.Abstractions.Interfaces.IChecksum
+  ctor()
+  method System.ReadOnlyMemory<byte> Compute(System.ReadOnlySpan<byte> payload)
+  method bool Validate(System.ReadOnlySpan<byte> payload, System.ReadOnlySpan<byte> expectedChecksum)
+  property int Size { get; }
+
+public sealed class Communication.Core.Export.MessageExporter : Communication.Abstractions.Interfaces.IMessageExporter
+  ctor()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<long>> ExportAsync(System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.MessageEnvelope> messages, System.IO.Stream destination, Communication.Abstractions.Models.MessageExportOptions options, System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Core.Framing.DelegatingFrameDecoder : Communication.Abstractions.Interfaces.IFrameDecoder
+  ctor(System.Func<System.Buffers.ReadOnlySequence<byte>, Communication.Abstractions.Interfaces.FrameDecodeResult> decoder)
+  method Communication.Abstractions.Interfaces.FrameDecodeResult TryDecode(System.Buffers.ReadOnlySequence<byte> buffer)
+
+public sealed class Communication.Core.Framing.DelimiterFrameDecoder : Communication.Abstractions.Interfaces.IFrameDecoder
+  ctor(System.ReadOnlySpan<byte> delimiter, bool includeDelimiter = false, int maxFrameLength = 1048576)
+  method Communication.Abstractions.Interfaces.FrameDecodeResult TryDecode(System.Buffers.ReadOnlySequence<byte> buffer)
+  property bool IncludeDelimiter { get; }
+  property int MaxFrameLength { get; }
+
+public sealed class Communication.Core.Framing.FixedLengthFrameDecoder : Communication.Abstractions.Interfaces.IFrameDecoder
+  ctor(int frameLength)
+  method Communication.Abstractions.Interfaces.FrameDecodeResult TryDecode(System.Buffers.ReadOnlySequence<byte> buffer)
+  property int FrameLength { get; }
+
+public sealed class Communication.Core.Framing.LengthFieldFrameDecoder : Communication.Abstractions.Interfaces.IFrameDecoder
+  ctor(int lengthFieldOffset, int lengthFieldLength, int lengthAdjustment = 0, int initialBytesToStrip = 0, bool littleEndian = false, int maxFrameLength = 1048576)
+  method Communication.Abstractions.Interfaces.FrameDecodeResult TryDecode(System.Buffers.ReadOnlySequence<byte> buffer)
+  property bool LittleEndian { get; }
+  property int InitialBytesToStrip { get; }
+  property int LengthAdjustment { get; }
+  property int LengthFieldLength { get; }
+  property int LengthFieldOffset { get; }
+  property int MaxFrameLength { get; }
+
+public sealed class Communication.Core.Framing.SilentIntervalFrameDecoder : Communication.Abstractions.Interfaces.IFrameDecoder
+  ctor(int maxFrameLength = 1048576)
+  method Communication.Abstractions.Interfaces.FrameDecodeResult TryDecode(System.Buffers.ReadOnlySequence<byte> buffer)
+  method void NotifySilence()
+  property int MaxFrameLength { get; }
+
+public sealed class Communication.Core.Monitoring.ByteRangeMessageRedactor : Communication.Abstractions.Interfaces.IMessageRedactor
+  ctor(System.Collections.Generic.IEnumerable<Communication.Core.Monitoring.ByteRedactionRange> ranges, byte mask = 42)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.MessageEnvelope>> RedactAsync(Communication.Abstractions.Models.MessageEnvelope message, System.Threading.CancellationToken cancellationToken = null)
+
+public struct Communication.Core.Monitoring.ByteRedactionRange : System.IEquatable<Communication.Core.Monitoring.ByteRedactionRange>
+  ctor(int Offset, int Length)
+  method bool Equals(Communication.Core.Monitoring.ByteRedactionRange other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out int Offset, out int Length)
+  property int Length { get; set; }
+  property int Offset { get; set; }
+
+public sealed class Communication.Core.Monitoring.DenyMessageRecordingRedactor : Communication.Abstractions.Interfaces.IMessageRedactor
+  ctor()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.MessageEnvelope>> RedactAsync(Communication.Abstractions.Models.MessageEnvelope message, System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Core.Monitoring.MessageMonitor : Communication.Abstractions.Interfaces.IMessageMonitor, System.IAsyncDisposable
+  ctor(Communication.Abstractions.Interfaces.IMessageRedactor redactor = null, int subscriberCapacity = 1024)
+  method System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.MessageEnvelope> SubscribeAsync(Communication.Abstractions.Models.MessageFilter filter = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask PublishAsync(Communication.Abstractions.Models.MessageEnvelope message, System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Core.Monitoring.MessageRedactionRule : System.IEquatable<Communication.Core.Monitoring.MessageRedactionRule>
+  ctor()
+  method Communication.Core.Monitoring.MessageRedactionRule <Clone>$()
+  method bool Equals(Communication.Core.Monitoring.MessageRedactionRule other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.Collections.Generic.IReadOnlyList<Communication.Core.Monitoring.ByteRedactionRange> ByteRanges { get; set; }
+  property System.Collections.Generic.IReadOnlyList<string> MetadataFields { get; set; }
+  property System.Nullable<Communication.Abstractions.Models.MessageDirection> Direction { get; set; }
+  property System.Nullable<long> AddressFrom { get; set; }
+  property System.Nullable<long> AddressTo { get; set; }
+  property string Protocol { get; set; }
+
+public sealed class Communication.Core.Monitoring.PassThroughMessageRedactor : Communication.Abstractions.Interfaces.IMessageRedactor
+  ctor()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.MessageEnvelope>> RedactAsync(Communication.Abstractions.Models.MessageEnvelope message, System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Core.Monitoring.RuleBasedMessageRedactor : Communication.Abstractions.Interfaces.IMessageRedactor
+  ctor(System.Collections.Generic.IEnumerable<Communication.Core.Monitoring.MessageRedactionRule> rules, Communication.Abstractions.Interfaces.IMessageRedactor fallback = null, byte mask = 42)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.MessageEnvelope>> RedactAsync(Communication.Abstractions.Models.MessageEnvelope message, System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Core.Monitoring.SuppressPayloadMessageRedactor : Communication.Abstractions.Interfaces.IMessageRedactor
+  ctor()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.MessageEnvelope>> RedactAsync(Communication.Abstractions.Models.MessageEnvelope message, System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Core.Plc.PlcValueConverter : Communication.Abstractions.Interfaces.IValueConverter
+  ctor()
+  method Communication.Abstractions.Models.CommunicationResult<System.ReadOnlyMemory<byte>> ToBytes(object value, Communication.Abstractions.Models.VariableDefinition definition)
+  method Communication.Abstractions.Models.CommunicationResult<object> FromBytes(System.ReadOnlySpan<byte> bytes, Communication.Abstractions.Models.VariableDefinition definition)
+  static method Communication.Abstractions.Models.CommunicationResult<int> GetByteCount(Communication.Abstractions.Models.VariableDefinition definition)
+
+public sealed class Communication.Core.Plc.VariableMonitor : Communication.Abstractions.Interfaces.IVariableMonitor, System.IAsyncDisposable
+  ctor(Communication.Abstractions.Interfaces.IPlcClient client)
+  method System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.VariableValue> WatchAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StartAsync(System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.VariableDefinition> variables, Communication.Abstractions.Models.VariableMonitorOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StopAsync(System.Threading.CancellationToken cancellationToken = null)
+  property bool IsRunning { get; }
+
+public sealed class Communication.Core.Queues.BoundedMessageQueue<T> : IMessageQueue<T>, System.IAsyncDisposable
+  ctor(int capacity, Communication.Abstractions.Models.QueueBackpressureStrategy backpressureStrategy = Communication.Abstractions.Models.QueueBackpressureStrategy.Wait, bool singleReader = false)
+  method IAsyncEnumerable<T> ReadAllAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.QueueWriteResult> WriteAsync(T item, System.Threading.CancellationToken cancellationToken = null)
+  method void Complete(System.Exception error = null)
+  property Communication.Abstractions.Models.QueueBackpressureStrategy BackpressureStrategy { get; }
+  property int Capacity { get; }
+
+public sealed class Communication.Core.Reliability.AutomaticReconnectCoordinator : System.IAsyncDisposable
+  ctor(Communication.Abstractions.Interfaces.ITransportChannel channel, Communication.Abstractions.Interfaces.IReconnectPolicy policy, System.Collections.Generic.IEnumerable<Communication.Abstractions.Interfaces.IConnectionRecoveryHandler> recoveryHandlers = null)
+  event System.EventHandler Reconnected
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Core.Reliability.CommunicationClientOptions : System.IEquatable<Communication.Core.Reliability.CommunicationClientOptions>
+  ctor()
+  method Communication.Core.Reliability.CommunicationClientOptions <Clone>$()
+  method bool Equals(Communication.Core.Reliability.CommunicationClientOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.TimeSpan DefaultTimeout { get; set; }
+  property int MaxBufferedBytes { get; set; }
+  property string ProtocolName { get; set; }
+
+public sealed class Communication.Core.Reliability.DelegatingConnectionRecoveryHandler : Communication.Abstractions.Interfaces.IConnectionRecoveryHandler
+  ctor(System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask> handler)
+  method System.Threading.Tasks.ValueTask OnReconnectedAsync(System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Core.Reliability.DelegatingHeartbeatStrategy : Communication.Abstractions.Interfaces.IHeartbeatStrategy
+  ctor(System.TimeSpan interval, System.Func<System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<System.ReadOnlyMemory<byte>>> createRequest, System.Func<System.ReadOnlyMemory<byte>, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<bool>> validateResponse)
+  method System.Threading.Tasks.ValueTask<System.ReadOnlyMemory<byte>> CreateRequestAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<bool> IsResponseValidAsync(System.ReadOnlyMemory<byte> response, System.Threading.CancellationToken cancellationToken = null)
+  property System.TimeSpan Interval { get; }
+
+public sealed class Communication.Core.Reliability.DelegatingResponseCorrelator<TRequest, TResponse> : IResponseCorrelator<TRequest, TResponse>
+  ctor(Func<TRequest, string> requestKeySelector, Func<TResponse, string> responseKeySelector, int maxInFlight = 256)
+  method string GetRequestKey(TRequest request)
+  method string GetResponseKey(TResponse response)
+  property int MaxInFlight { get; }
+
+public sealed class Communication.Core.Reliability.ExponentialBackoffReconnectPolicy : Communication.Abstractions.Interfaces.IReconnectPolicy
+  ctor(int maxAttempts = 10, System.Nullable<System.TimeSpan> initialDelay = null, System.Nullable<System.TimeSpan> maxDelay = null, double multiplier = 2, double jitterRatio = 0.2, System.Nullable<int> randomSeed = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.RetryDecision> GetDecisionAsync(Communication.Abstractions.Models.ReconnectContext context, System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Core.Reliability.ExponentialBackoffRetryPolicy : Communication.Abstractions.Interfaces.IRetryPolicy
+  ctor(int maxAttempts = 3, System.Nullable<System.TimeSpan> initialDelay = null, System.Nullable<System.TimeSpan> maxDelay = null, double multiplier = 2, double jitterRatio = 0.2, System.Func<Communication.Abstractions.Models.CommunicationError, bool> shouldRetry = null, System.Nullable<int> randomSeed = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.RetryDecision> GetDecisionAsync(Communication.Abstractions.Models.RetryContext context, System.Threading.CancellationToken cancellationToken = null)
+  property System.TimeSpan InitialDelay { get; }
+  property System.TimeSpan MaxDelay { get; }
+  property double JitterRatio { get; }
+  property double Multiplier { get; }
+  property int MaxAttempts { get; }
+
+public sealed class Communication.Core.Reliability.HeartbeatFailureEventArgs : System.EventArgs
+  ctor(int consecutiveFailures, Communication.Abstractions.Models.CommunicationError error)
+  property Communication.Abstractions.Models.CommunicationError Error { get; }
+  property int ConsecutiveFailures { get; }
+
+public sealed class Communication.Core.Reliability.HeartbeatService : System.IAsyncDisposable
+  ctor(Communication.Abstractions.Interfaces.IHeartbeatStrategy strategy, System.Func<System.ReadOnlyMemory<byte>, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.ReadOnlyMemory<byte>>>> exchange, int maxConsecutiveFailures = 3)
+  event System.EventHandler<Communication.Core.Reliability.HeartbeatFailureEventArgs> Failed
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask StopAsync()
+  method void Start()
+  property bool IsRunning { get; }
+
+public sealed class Communication.Core.Reliability.ReliableCommunicationClient<TRequest, TResponse> : ICommunicationClient<TRequest, TResponse>, System.IAsyncDisposable
+  ctor(Communication.Abstractions.Interfaces.ITransportChannel channel, IProtocolCodec<TRequest, TResponse> codec, IResponseCorrelator<TRequest, TResponse> correlator, Communication.Core.Reliability.CommunicationClientOptions options = null, Communication.Abstractions.Interfaces.IRetryPolicy retryPolicy = null, Communication.Abstractions.Interfaces.IReconnectPolicy reconnectPolicy = null, Communication.Abstractions.Interfaces.IMessageMonitor monitor = null, System.Collections.Generic.IEnumerable<Communication.Abstractions.Interfaces.IConnectionRecoveryHandler> recoveryHandlers = null)
+  event System.EventHandler Reconnected
+  event System.EventHandler<Communication.Abstractions.Models.ConnectionStateChangedEventArgs> StateChanged
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method ValueTask<CommunicationResult<TResponse>> ExecuteAsync(TRequest request, Communication.Abstractions.Models.CommunicationRequestOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public sealed class Communication.Core.Reliability.SingleRequestCorrelator<TRequest, TResponse> : IResponseCorrelator<TRequest, TResponse>
+  ctor()
+  method string GetRequestKey(TRequest request)
+  method string GetResponseKey(TResponse response)
+  property int MaxInFlight { get; }
+
+public sealed class Communication.Core.Replay.MessageReplayService : Communication.Abstractions.Interfaces.IMessageReplayService
+  ctor()
+  method System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.MessageEnvelope> ReplayAsync(System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.MessageEnvelope> messages, Communication.Abstractions.Models.MessageReplayOptions options, System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Core.Simulation.DelegatingSimulationResponseScript : Communication.Abstractions.Interfaces.ISimulationResponseScript
+  ctor(System.Func<Communication.Abstractions.Models.SimulationRequest, System.Threading.CancellationToken, System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.SimulationResponseDirective>> handler)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.SimulationResponseDirective> GetDirectiveAsync(Communication.Abstractions.Models.SimulationRequest request, System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Core.Storage.FileMessageStore : Communication.Abstractions.Interfaces.IMessageStore, System.IAsyncDisposable
+  ctor(Communication.Core.Storage.FileMessageStoreOptions options)
+  method System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.MessageEnvelope> QueryAsync(Communication.Abstractions.Models.MessageFilter filter, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> AppendAsync(Communication.Abstractions.Models.MessageEnvelope message, System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Core.Storage.FileMessageStoreOptions : System.IEquatable<Communication.Core.Storage.FileMessageStoreOptions>
+  ctor()
+  method Communication.Core.Storage.FileMessageStoreOptions <Clone>$()
+  method bool Equals(Communication.Core.Storage.FileMessageStoreOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.TimeSpan RetentionPeriod { get; set; }
+  property long MaxTotalSizeBytes { get; set; }
+  property long RollFileSizeBytes { get; set; }
+  property string DirectoryPath { get; set; }
+
+public sealed class Communication.Core.Storage.MessagePersistenceFailedEventArgs : System.EventArgs
+  ctor(Communication.Abstractions.Models.MessageEnvelope message, Communication.Abstractions.Models.CommunicationError error)
+  property Communication.Abstractions.Models.CommunicationError Error { get; }
+  property Communication.Abstractions.Models.MessageEnvelope Message { get; }
+
+public sealed class Communication.Core.Storage.MessageStoreWriter : System.IAsyncDisposable
+  ctor(Communication.Abstractions.Interfaces.IMessageMonitor monitor, Communication.Abstractions.Interfaces.IMessageStore store, Communication.Abstractions.Models.MessageFilter filter = null)
+  event System.EventHandler<Communication.Core.Storage.MessagePersistenceFailedEventArgs> PersistenceFailed
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method void Start()
+

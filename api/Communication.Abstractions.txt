@@ -1,0 +1,678 @@
+# Public API baseline: Communication.Abstractions
+# Update intentionally with tools/ApiSurface --write.
+
+public sealed class Communication.Abstractions.ConnectionStateMachine
+  ctor()
+  event System.EventHandler<Communication.Abstractions.Models.ConnectionStateChangedEventArgs> StateChanged
+  method bool CanTransitionTo(Communication.Abstractions.Models.ConnectionState nextState)
+  method bool TryTransition(Communication.Abstractions.Models.ConnectionState nextState, Communication.Abstractions.Models.CommunicationError error = null)
+  method void TransitionTo(Communication.Abstractions.Models.ConnectionState nextState, Communication.Abstractions.Models.CommunicationError error = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public sealed class Communication.Abstractions.Exceptions.ChecksumException : Communication.Abstractions.Exceptions.CommunicationException, System.Runtime.Serialization.ISerializable
+  ctor(string message, System.Exception innerException = null)
+
+public class Communication.Abstractions.Exceptions.CommunicationException : System.Exception, System.Runtime.Serialization.ISerializable
+  ctor(Communication.Abstractions.Models.CommunicationErrorCode errorCode, string message, System.Exception innerException = null)
+  property Communication.Abstractions.Models.CommunicationErrorCode ErrorCode { get; }
+  static method System.Exception FromError(Communication.Abstractions.Models.CommunicationError error)
+
+public sealed class Communication.Abstractions.Exceptions.CommunicationTimeoutException : System.TimeoutException, System.Runtime.Serialization.ISerializable
+  ctor(string message, System.Exception innerException = null)
+
+public sealed class Communication.Abstractions.Exceptions.ConnectionException : Communication.Abstractions.Exceptions.CommunicationException, System.Runtime.Serialization.ISerializable
+  ctor(string message, System.Exception innerException = null)
+
+public sealed class Communication.Abstractions.Exceptions.DeviceException : Communication.Abstractions.Exceptions.CommunicationException, System.Runtime.Serialization.ISerializable
+  ctor(string message, string deviceErrorCode = null, System.Exception innerException = null)
+  property string DeviceErrorCode { get; }
+
+public sealed class Communication.Abstractions.Exceptions.ProtocolException : Communication.Abstractions.Exceptions.CommunicationException, System.Runtime.Serialization.ISerializable
+  ctor(string message, System.Exception innerException = null)
+
+public sealed class Communication.Abstractions.Interfaces.FrameDecodeResult : System.IEquatable<Communication.Abstractions.Interfaces.FrameDecodeResult>
+  method Communication.Abstractions.Interfaces.FrameDecodeResult <Clone>$()
+  method bool Equals(Communication.Abstractions.Interfaces.FrameDecodeResult other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property Communication.Abstractions.Models.CommunicationError Error { get; }
+  property Communication.Abstractions.Models.DecodeStatus Status { get; }
+  property System.ReadOnlyMemory<byte> Frame { get; }
+  property long Consumed { get; }
+  property long Examined { get; }
+  static method Communication.Abstractions.Interfaces.FrameDecodeResult Done(System.ReadOnlyMemory<byte> frame, long consumed)
+  static method Communication.Abstractions.Interfaces.FrameDecodeResult Invalid(Communication.Abstractions.Models.CommunicationError error, long consumed, long examined)
+  static method Communication.Abstractions.Interfaces.FrameDecodeResult NeedMoreData(long examined)
+
+public interface Communication.Abstractions.Interfaces.IAddressParser
+  method Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.PlcAddress> Parse(string address)
+
+public interface Communication.Abstractions.Interfaces.IBarcodeScanner : Communication.Abstractions.Interfaces.IDeviceAdapter, System.IAsyncDisposable
+  event System.EventHandler<Communication.Abstractions.Models.BarcodeScannedEventArgs> BarcodeScanned
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> TriggerAsync(System.Threading.CancellationToken cancellationToken = null)
+
+public interface Communication.Abstractions.Interfaces.IChecksum
+  method System.ReadOnlyMemory<byte> Compute(System.ReadOnlySpan<byte> payload)
+  method bool Validate(System.ReadOnlySpan<byte> payload, System.ReadOnlySpan<byte> expectedChecksum)
+  property int Size { get; }
+
+public interface Communication.Abstractions.Interfaces.ICommunicationClient<TRequest, TResponse> : System.IAsyncDisposable
+  event System.EventHandler<Communication.Abstractions.Models.ConnectionStateChangedEventArgs> StateChanged
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method ValueTask<CommunicationResult<TResponse>> ExecuteAsync(TRequest request, Communication.Abstractions.Models.CommunicationRequestOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public interface Communication.Abstractions.Interfaces.ICommunicationServer : System.IAsyncDisposable
+  event System.EventHandler<Communication.Abstractions.Models.ConnectionStateChangedEventArgs> StateChanged
+  method System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.ServerRequestContext> ReadRequestsAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<int>> SendAsync(string sessionId, System.ReadOnlyMemory<byte> payload, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StartAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StopAsync(System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+  property System.Collections.Generic.IReadOnlyCollection<Communication.Abstractions.Models.CommunicationSession> Sessions { get; }
+
+public interface Communication.Abstractions.Interfaces.ICommunicationSimulator : System.IAsyncDisposable
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> InjectFaultAsync(Communication.Abstractions.Models.SimulatorFault fault, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StartAsync(Communication.Abstractions.Models.CommunicationSimulatorOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StopAsync(System.Threading.CancellationToken cancellationToken = null)
+  property bool IsRunning { get; }
+
+public interface Communication.Abstractions.Interfaces.IConnectionRecoveryHandler
+  method System.Threading.Tasks.ValueTask OnReconnectedAsync(System.Threading.CancellationToken cancellationToken = null)
+
+public interface Communication.Abstractions.Interfaces.IDeviceAdapter : System.IAsyncDisposable
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StartAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StopAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.DeviceHealth> CheckHealthAsync(System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+  property Communication.Abstractions.Models.DeviceHealth Health { get; }
+  property string DeviceId { get; }
+
+public interface Communication.Abstractions.Interfaces.IDigitalIoDevice : Communication.Abstractions.Interfaces.IDeviceAdapter, System.IAsyncDisposable
+  event System.EventHandler<Communication.Abstractions.Models.DigitalEdgeChangedEventArgs> InputChanged
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.DigitalIoSnapshot>> ReadStatusAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> SetOutputAsync(int index, bool value, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult>> SetOutputsAsync(System.Collections.Generic.IReadOnlyDictionary<int, bool> values, System.Threading.CancellationToken cancellationToken = null)
+
+public interface Communication.Abstractions.Interfaces.IFrameDecoder
+  method Communication.Abstractions.Interfaces.FrameDecodeResult TryDecode(System.Buffers.ReadOnlySequence<byte> buffer)
+
+public interface Communication.Abstractions.Interfaces.IHeartbeatStrategy
+  method System.Threading.Tasks.ValueTask<System.ReadOnlyMemory<byte>> CreateRequestAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<bool> IsResponseValidAsync(System.ReadOnlyMemory<byte> response, System.Threading.CancellationToken cancellationToken = null)
+  property System.TimeSpan Interval { get; }
+
+public interface Communication.Abstractions.Interfaces.IMessageExporter
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<long>> ExportAsync(System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.MessageEnvelope> messages, System.IO.Stream destination, Communication.Abstractions.Models.MessageExportOptions options, System.Threading.CancellationToken cancellationToken = null)
+
+public interface Communication.Abstractions.Interfaces.IMessageMonitor
+  method System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.MessageEnvelope> SubscribeAsync(Communication.Abstractions.Models.MessageFilter filter = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask PublishAsync(Communication.Abstractions.Models.MessageEnvelope message, System.Threading.CancellationToken cancellationToken = null)
+
+public interface Communication.Abstractions.Interfaces.IMessageQueue<T> : System.IAsyncDisposable
+  method IAsyncEnumerable<T> ReadAllAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.QueueWriteResult> WriteAsync(T item, System.Threading.CancellationToken cancellationToken = null)
+  method void Complete(System.Exception error = null)
+  property Communication.Abstractions.Models.QueueBackpressureStrategy BackpressureStrategy { get; }
+  property int Capacity { get; }
+
+public interface Communication.Abstractions.Interfaces.IMessageRedactor
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.MessageEnvelope>> RedactAsync(Communication.Abstractions.Models.MessageEnvelope message, System.Threading.CancellationToken cancellationToken = null)
+
+public interface Communication.Abstractions.Interfaces.IMessageReplayService
+  method System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.MessageEnvelope> ReplayAsync(System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.MessageEnvelope> messages, Communication.Abstractions.Models.MessageReplayOptions options, System.Threading.CancellationToken cancellationToken = null)
+
+public interface Communication.Abstractions.Interfaces.IMessageStore
+  method System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.MessageEnvelope> QueryAsync(Communication.Abstractions.Models.MessageFilter filter, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> AppendAsync(Communication.Abstractions.Models.MessageEnvelope message, System.Threading.CancellationToken cancellationToken = null)
+
+public interface Communication.Abstractions.Interfaces.IMotionController : Communication.Abstractions.Interfaces.IDeviceAdapter, System.IAsyncDisposable
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.AxisState>> GetAxisStateAsync(int axis, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> HomeAsync(int axis, Communication.Abstractions.Models.MotionProfile profile = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> MoveAbsoluteAsync(int axis, double position, Communication.Abstractions.Models.MotionProfile profile, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> MoveRelativeAsync(int axis, double distance, Communication.Abstractions.Models.MotionProfile profile, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> SetEnabledAsync(int axis, bool enabled, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StopAxisAsync(int axis, Communication.Abstractions.Models.MotionStopMode mode = Communication.Abstractions.Models.MotionStopMode.Decelerated, System.Threading.CancellationToken cancellationToken = null)
+
+public interface Communication.Abstractions.Interfaces.IPlcClient : System.IAsyncDisposable
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.VariableValue>> ReadAsync(Communication.Abstractions.Models.VariableDefinition variable, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteAsync(Communication.Abstractions.Models.PlcWriteRequest request, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.VariableValue>>> ReadAsync(System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.VariableDefinition> variables, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult>> WriteAsync(System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.PlcWriteRequest> requests, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public interface Communication.Abstractions.Interfaces.IProtocolCodec<TRequest, TResponse>
+  method ProtocolDecodeResult<TResponse> TryDecode(System.Buffers.ReadOnlySequence<byte> buffer)
+  method System.ReadOnlyMemory<byte> Encode(TRequest request)
+
+public interface Communication.Abstractions.Interfaces.IReconnectPolicy
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.RetryDecision> GetDecisionAsync(Communication.Abstractions.Models.ReconnectContext context, System.Threading.CancellationToken cancellationToken = null)
+
+public interface Communication.Abstractions.Interfaces.IResponseCorrelator<TRequest, TResponse>
+  method string GetRequestKey(TRequest request)
+  method string GetResponseKey(TResponse response)
+  property int MaxInFlight { get; }
+
+public interface Communication.Abstractions.Interfaces.IRetryPolicy
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.RetryDecision> GetDecisionAsync(Communication.Abstractions.Models.RetryContext context, System.Threading.CancellationToken cancellationToken = null)
+
+public interface Communication.Abstractions.Interfaces.ISimulationResponseScript
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.SimulationResponseDirective> GetDirectiveAsync(Communication.Abstractions.Models.SimulationRequest request, System.Threading.CancellationToken cancellationToken = null)
+
+public interface Communication.Abstractions.Interfaces.ITransportChannel : System.IAsyncDisposable
+  event System.EventHandler<Communication.Abstractions.Models.ConnectionStateChangedEventArgs> StateChanged
+  method System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>> ReceiveAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<int>> SendAsync(System.ReadOnlyMemory<byte> payload, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+  property string ChannelId { get; }
+
+public interface Communication.Abstractions.Interfaces.IValueConverter
+  method Communication.Abstractions.Models.CommunicationResult<System.ReadOnlyMemory<byte>> ToBytes(object value, Communication.Abstractions.Models.VariableDefinition definition)
+  method Communication.Abstractions.Models.CommunicationResult<object> FromBytes(System.ReadOnlySpan<byte> bytes, Communication.Abstractions.Models.VariableDefinition definition)
+
+public interface Communication.Abstractions.Interfaces.IVariableMonitor : System.IAsyncDisposable
+  method System.Collections.Generic.IAsyncEnumerable<Communication.Abstractions.Models.VariableValue> WatchAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StartAsync(System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.VariableDefinition> variables, Communication.Abstractions.Models.VariableMonitorOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StopAsync(System.Threading.CancellationToken cancellationToken = null)
+  property bool IsRunning { get; }
+
+public interface Communication.Abstractions.Interfaces.IWeighingDevice : Communication.Abstractions.Interfaces.IDeviceAdapter, System.IAsyncDisposable
+  event System.EventHandler<Communication.Abstractions.Models.WeightReportedEventArgs> WeightReported
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.WeightReading>> ReadWeightAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> TareAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ZeroAsync(System.Threading.CancellationToken cancellationToken = null)
+
+public sealed class Communication.Abstractions.Interfaces.ProtocolDecodeResult<T> : IEquatable<Communication.Abstractions.Interfaces.ProtocolDecodeResult<T>>
+  method Communication.Abstractions.Interfaces.ProtocolDecodeResult<T> <Clone>$()
+  method bool Equals(Communication.Abstractions.Interfaces.ProtocolDecodeResult<T> other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property Communication.Abstractions.Models.CommunicationError Error { get; }
+  property Communication.Abstractions.Models.DecodeStatus Status { get; }
+  property T Value { get; }
+  property long Consumed { get; }
+  property long Examined { get; }
+  static method Communication.Abstractions.Interfaces.ProtocolDecodeResult<T> Done(T value, long consumed)
+  static method Communication.Abstractions.Interfaces.ProtocolDecodeResult<T> Invalid(Communication.Abstractions.Models.CommunicationError error, long consumed, long examined)
+  static method Communication.Abstractions.Interfaces.ProtocolDecodeResult<T> NeedMoreData(long examined)
+
+public sealed class Communication.Abstractions.Models.AxisState : System.IEquatable<Communication.Abstractions.Models.AxisState>
+  ctor(int Axis, bool Enabled, bool Homed, bool Moving, bool Alarmed, double Position, System.DateTimeOffset Timestamp, string Alarm = null)
+  method Communication.Abstractions.Models.AxisState <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.AxisState other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out int Axis, out bool Enabled, out bool Homed, out bool Moving, out bool Alarmed, out double Position, out System.DateTimeOffset Timestamp, out string Alarm)
+  property System.DateTimeOffset Timestamp { get; set; }
+  property bool Alarmed { get; set; }
+  property bool Enabled { get; set; }
+  property bool Homed { get; set; }
+  property bool Moving { get; set; }
+  property double Position { get; set; }
+  property int Axis { get; set; }
+  property string Alarm { get; set; }
+
+public sealed class Communication.Abstractions.Models.BarcodeScannedEventArgs : System.EventArgs
+  ctor(string value, System.DateTimeOffset timestamp, System.ReadOnlyMemory<byte> rawFrame)
+  property System.DateTimeOffset Timestamp { get; }
+  property System.ReadOnlyMemory<byte> RawFrame { get; }
+  property string Value { get; }
+
+public sealed class Communication.Abstractions.Models.CommunicationError : System.IEquatable<Communication.Abstractions.Models.CommunicationError>
+  ctor(Communication.Abstractions.Models.CommunicationErrorCode Code, string Message, string Detail = null, System.Exception Exception = null)
+  method Communication.Abstractions.Models.CommunicationError <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.CommunicationError other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out Communication.Abstractions.Models.CommunicationErrorCode Code, out string Message, out string Detail, out System.Exception Exception)
+  property Communication.Abstractions.Models.CommunicationErrorCode Code { get; set; }
+  property System.Exception Exception { get; set; }
+  property string Detail { get; set; }
+  property string Message { get; set; }
+  static method Communication.Abstractions.Models.CommunicationError FromException(System.Exception exception)
+
+public enum Communication.Abstractions.Models.CommunicationErrorCode : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.CommunicationErrorCode Canceled = 2
+  static field Communication.Abstractions.Models.CommunicationErrorCode ChecksumFailure = 5
+  static field Communication.Abstractions.Models.CommunicationErrorCode ConnectionFailure = 3
+  static field Communication.Abstractions.Models.CommunicationErrorCode DeviceError = 6
+  static field Communication.Abstractions.Models.CommunicationErrorCode InvalidAddress = 7
+  static field Communication.Abstractions.Models.CommunicationErrorCode InvalidState = 10
+  static field Communication.Abstractions.Models.CommunicationErrorCode InvalidValue = 8
+  static field Communication.Abstractions.Models.CommunicationErrorCode ProtocolError = 4
+  static field Communication.Abstractions.Models.CommunicationErrorCode QueueFull = 9
+  static field Communication.Abstractions.Models.CommunicationErrorCode StorageFailure = 11
+  static field Communication.Abstractions.Models.CommunicationErrorCode Timeout = 1
+  static field Communication.Abstractions.Models.CommunicationErrorCode Unknown = 0
+
+public sealed class Communication.Abstractions.Models.CommunicationRequestOptions : System.IEquatable<Communication.Abstractions.Models.CommunicationRequestOptions>
+  ctor()
+  method Communication.Abstractions.Models.CommunicationRequestOptions <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.CommunicationRequestOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.Nullable<System.TimeSpan> Timeout { get; set; }
+  property bool EnableRetry { get; set; }
+
+public sealed class Communication.Abstractions.Models.CommunicationResult
+  property Communication.Abstractions.Models.CommunicationError Error { get; }
+  property bool IsSuccess { get; }
+  static method Communication.Abstractions.Models.CommunicationResult Failure(Communication.Abstractions.Models.CommunicationError error)
+  static method Communication.Abstractions.Models.CommunicationResult Success()
+
+public sealed class Communication.Abstractions.Models.CommunicationResult<T>
+  method T GetValueOrThrow()
+  property Communication.Abstractions.Models.CommunicationError Error { get; }
+  property T Value { get; }
+  property bool IsSuccess { get; }
+  static method Communication.Abstractions.Models.CommunicationResult<T> Failure(Communication.Abstractions.Models.CommunicationError error)
+  static method Communication.Abstractions.Models.CommunicationResult<T> Success(T value)
+
+public sealed class Communication.Abstractions.Models.CommunicationSession : System.IEquatable<Communication.Abstractions.Models.CommunicationSession>
+  ctor(string SessionId, System.DateTimeOffset ConnectedAt, string RemoteEndpoint = null)
+  method Communication.Abstractions.Models.CommunicationSession <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.CommunicationSession other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out string SessionId, out System.DateTimeOffset ConnectedAt, out string RemoteEndpoint)
+  property System.DateTimeOffset ConnectedAt { get; set; }
+  property string RemoteEndpoint { get; set; }
+  property string SessionId { get; set; }
+
+public sealed class Communication.Abstractions.Models.CommunicationSimulatorOptions : System.IEquatable<Communication.Abstractions.Models.CommunicationSimulatorOptions>
+  ctor()
+  method Communication.Abstractions.Models.CommunicationSimulatorOptions <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.CommunicationSimulatorOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.Nullable<int> RandomSeed { get; set; }
+  property System.TimeSpan ResponseDelay { get; set; }
+
+public enum Communication.Abstractions.Models.ConnectionState : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.ConnectionState Connected = 2
+  static field Communication.Abstractions.Models.ConnectionState Connecting = 1
+  static field Communication.Abstractions.Models.ConnectionState Disconnected = 0
+  static field Communication.Abstractions.Models.ConnectionState Disconnecting = 4
+  static field Communication.Abstractions.Models.ConnectionState Faulted = 5
+  static field Communication.Abstractions.Models.ConnectionState Reconnecting = 3
+
+public sealed class Communication.Abstractions.Models.ConnectionStateChangedEventArgs : System.EventArgs
+  ctor(Communication.Abstractions.Models.ConnectionState previousState, Communication.Abstractions.Models.ConnectionState currentState, System.DateTimeOffset timestamp, Communication.Abstractions.Models.CommunicationError error = null)
+  property Communication.Abstractions.Models.CommunicationError Error { get; }
+  property Communication.Abstractions.Models.ConnectionState CurrentState { get; }
+  property Communication.Abstractions.Models.ConnectionState PreviousState { get; }
+  property System.DateTimeOffset Timestamp { get; }
+
+public enum Communication.Abstractions.Models.DecodeStatus : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.DecodeStatus Done = 1
+  static field Communication.Abstractions.Models.DecodeStatus InvalidData = 2
+  static field Communication.Abstractions.Models.DecodeStatus NeedMoreData = 0
+
+public sealed class Communication.Abstractions.Models.DeviceHealth : System.IEquatable<Communication.Abstractions.Models.DeviceHealth>
+  ctor(Communication.Abstractions.Models.DeviceHealthStatus Status, System.DateTimeOffset Timestamp, string Description = null, Communication.Abstractions.Models.CommunicationError Error = null)
+  method Communication.Abstractions.Models.DeviceHealth <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.DeviceHealth other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out Communication.Abstractions.Models.DeviceHealthStatus Status, out System.DateTimeOffset Timestamp, out string Description, out Communication.Abstractions.Models.CommunicationError Error)
+  property Communication.Abstractions.Models.CommunicationError Error { get; set; }
+  property Communication.Abstractions.Models.DeviceHealthStatus Status { get; set; }
+  property System.DateTimeOffset Timestamp { get; set; }
+  property string Description { get; set; }
+
+public enum Communication.Abstractions.Models.DeviceHealthStatus : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.DeviceHealthStatus Degraded = 2
+  static field Communication.Abstractions.Models.DeviceHealthStatus Healthy = 1
+  static field Communication.Abstractions.Models.DeviceHealthStatus Unhealthy = 3
+  static field Communication.Abstractions.Models.DeviceHealthStatus Unknown = 0
+
+public sealed class Communication.Abstractions.Models.DigitalEdgeChangedEventArgs : System.EventArgs
+  ctor(int index, bool previousValue, bool currentValue, System.DateTimeOffset timestamp)
+  property System.DateTimeOffset Timestamp { get; }
+  property bool CurrentValue { get; }
+  property bool PreviousValue { get; }
+  property int Index { get; }
+
+public sealed class Communication.Abstractions.Models.DigitalIoSnapshot : System.IEquatable<Communication.Abstractions.Models.DigitalIoSnapshot>
+  ctor(System.Collections.Generic.IReadOnlyList<bool> Inputs, System.Collections.Generic.IReadOnlyList<bool> Outputs, System.DateTimeOffset Timestamp)
+  method Communication.Abstractions.Models.DigitalIoSnapshot <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.DigitalIoSnapshot other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out System.Collections.Generic.IReadOnlyList<bool> Inputs, out System.Collections.Generic.IReadOnlyList<bool> Outputs, out System.DateTimeOffset Timestamp)
+  property System.Collections.Generic.IReadOnlyList<bool> Inputs { get; set; }
+  property System.Collections.Generic.IReadOnlyList<bool> Outputs { get; set; }
+  property System.DateTimeOffset Timestamp { get; set; }
+
+public enum Communication.Abstractions.Models.MessageDirection : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.MessageDirection Inbound = 1
+  static field Communication.Abstractions.Models.MessageDirection Outbound = 0
+
+public sealed class Communication.Abstractions.Models.MessageEnvelope : System.IEquatable<Communication.Abstractions.Models.MessageEnvelope>
+  ctor(System.Guid Id, System.DateTimeOffset Timestamp, Communication.Abstractions.Models.MessageDirection Direction, string ChannelId, System.ReadOnlyMemory<byte> Payload, string SessionId = null, string Protocol = null, string Summary = null, System.Nullable<System.TimeSpan> Duration = null, bool IsRedacted = false, System.Collections.Generic.IReadOnlyDictionary<string, string> Metadata = null)
+  method Communication.Abstractions.Models.MessageEnvelope <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.MessageEnvelope other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out System.Guid Id, out System.DateTimeOffset Timestamp, out Communication.Abstractions.Models.MessageDirection Direction, out string ChannelId, out System.ReadOnlyMemory<byte> Payload, out string SessionId, out string Protocol, out string Summary, out System.Nullable<System.TimeSpan> Duration, out bool IsRedacted, out System.Collections.Generic.IReadOnlyDictionary<string, string> Metadata)
+  property Communication.Abstractions.Models.MessageDirection Direction { get; set; }
+  property System.Collections.Generic.IReadOnlyDictionary<string, string> Metadata { get; set; }
+  property System.DateTimeOffset Timestamp { get; set; }
+  property System.Guid Id { get; set; }
+  property System.Nullable<System.TimeSpan> Duration { get; set; }
+  property System.ReadOnlyMemory<byte> Payload { get; set; }
+  property bool IsRedacted { get; set; }
+  property string ChannelId { get; set; }
+  property string Protocol { get; set; }
+  property string SessionId { get; set; }
+  property string Summary { get; set; }
+
+public sealed class Communication.Abstractions.Models.MessageExportOptions : System.IEquatable<Communication.Abstractions.Models.MessageExportOptions>
+  ctor(string Format, bool IncludePayload = false)
+  method Communication.Abstractions.Models.MessageExportOptions <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.MessageExportOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out string Format, out bool IncludePayload)
+  property bool IncludePayload { get; set; }
+  property string Format { get; set; }
+
+public sealed class Communication.Abstractions.Models.MessageFilter : System.IEquatable<Communication.Abstractions.Models.MessageFilter>
+  ctor()
+  method Communication.Abstractions.Models.MessageFilter <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.MessageFilter other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.Nullable<Communication.Abstractions.Models.MessageDirection> Direction { get; set; }
+  property System.Nullable<System.DateTimeOffset> From { get; set; }
+  property System.Nullable<System.DateTimeOffset> To { get; set; }
+  property string ChannelId { get; set; }
+  property string Protocol { get; set; }
+  property string SessionId { get; set; }
+
+public sealed class Communication.Abstractions.Models.MessageReplayOptions : System.IEquatable<Communication.Abstractions.Models.MessageReplayOptions>
+  ctor()
+  method Communication.Abstractions.Models.MessageReplayOptions <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.MessageReplayOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property Communication.Abstractions.Models.ReplayTimingMode TimingMode { get; set; }
+  property System.Nullable<Communication.Abstractions.Models.MessageDirection> Direction { get; set; }
+  property System.TimeSpan FixedInterval { get; set; }
+  property double Speed { get; set; }
+
+public sealed class Communication.Abstractions.Models.MotionProfile : System.IEquatable<Communication.Abstractions.Models.MotionProfile>
+  ctor(double Velocity, double Acceleration, double Deceleration)
+  method Communication.Abstractions.Models.MotionProfile <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.MotionProfile other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out double Velocity, out double Acceleration, out double Deceleration)
+  property double Acceleration { get; set; }
+  property double Deceleration { get; set; }
+  property double Velocity { get; set; }
+
+public enum Communication.Abstractions.Models.MotionStopMode : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.MotionStopMode Decelerated = 0
+  static field Communication.Abstractions.Models.MotionStopMode Emergency = 1
+
+public sealed class Communication.Abstractions.Models.PlcAddress : System.IEquatable<Communication.Abstractions.Models.PlcAddress>
+  ctor(string Area, int Offset, System.Nullable<int> Bit, string Original)
+  method Communication.Abstractions.Models.PlcAddress <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.PlcAddress other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out string Area, out int Offset, out System.Nullable<int> Bit, out string Original)
+  property System.Nullable<int> Bit { get; set; }
+  property int Offset { get; set; }
+  property string Area { get; set; }
+  property string Original { get; set; }
+
+public enum Communication.Abstractions.Models.PlcByteOrder : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.PlcByteOrder BigEndian = 0
+  static field Communication.Abstractions.Models.PlcByteOrder ByteSwap = 2
+  static field Communication.Abstractions.Models.PlcByteOrder LittleEndian = 1
+  static field Communication.Abstractions.Models.PlcByteOrder WordSwap = 3
+
+public enum Communication.Abstractions.Models.PlcDataType : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.PlcDataType Boolean = 0
+  static field Communication.Abstractions.Models.PlcDataType Byte = 1
+  static field Communication.Abstractions.Models.PlcDataType Bytes = 9
+  static field Communication.Abstractions.Models.PlcDataType Float32 = 6
+  static field Communication.Abstractions.Models.PlcDataType Float64 = 7
+  static field Communication.Abstractions.Models.PlcDataType Int16 = 2
+  static field Communication.Abstractions.Models.PlcDataType Int32 = 4
+  static field Communication.Abstractions.Models.PlcDataType String = 8
+  static field Communication.Abstractions.Models.PlcDataType UInt16 = 3
+  static field Communication.Abstractions.Models.PlcDataType UInt32 = 5
+
+public enum Communication.Abstractions.Models.PlcStringEncoding : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.PlcStringEncoding Ascii = 0
+  static field Communication.Abstractions.Models.PlcStringEncoding Utf8 = 1
+
+public sealed class Communication.Abstractions.Models.PlcWriteRequest : System.IEquatable<Communication.Abstractions.Models.PlcWriteRequest>
+  ctor(Communication.Abstractions.Models.VariableDefinition Definition, object Value)
+  method Communication.Abstractions.Models.PlcWriteRequest <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.PlcWriteRequest other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out Communication.Abstractions.Models.VariableDefinition Definition, out object Value)
+  property Communication.Abstractions.Models.VariableDefinition Definition { get; set; }
+  property object Value { get; set; }
+
+public enum Communication.Abstractions.Models.QueueBackpressureStrategy : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.QueueBackpressureStrategy DropNewest = 3
+  static field Communication.Abstractions.Models.QueueBackpressureStrategy DropOldest = 2
+  static field Communication.Abstractions.Models.QueueBackpressureStrategy Reject = 1
+  static field Communication.Abstractions.Models.QueueBackpressureStrategy Wait = 0
+
+public struct Communication.Abstractions.Models.QueueWriteResult : System.IEquatable<Communication.Abstractions.Models.QueueWriteResult>
+  ctor(bool Accepted, bool Dropped)
+  method bool Equals(Communication.Abstractions.Models.QueueWriteResult other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out bool Accepted, out bool Dropped)
+  property bool Accepted { get; set; }
+  property bool Dropped { get; set; }
+
+public sealed class Communication.Abstractions.Models.ReconnectContext : System.IEquatable<Communication.Abstractions.Models.ReconnectContext>
+  ctor(int Attempt, System.TimeSpan Elapsed, Communication.Abstractions.Models.CommunicationError Error, bool WasUserInitiated)
+  method Communication.Abstractions.Models.ReconnectContext <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.ReconnectContext other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out int Attempt, out System.TimeSpan Elapsed, out Communication.Abstractions.Models.CommunicationError Error, out bool WasUserInitiated)
+  property Communication.Abstractions.Models.CommunicationError Error { get; set; }
+  property System.TimeSpan Elapsed { get; set; }
+  property bool WasUserInitiated { get; set; }
+  property int Attempt { get; set; }
+
+public enum Communication.Abstractions.Models.ReplayTimingMode : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.ReplayTimingMode AsFastAsPossible = 2
+  static field Communication.Abstractions.Models.ReplayTimingMode FixedInterval = 1
+  static field Communication.Abstractions.Models.ReplayTimingMode OriginalIntervals = 0
+
+public sealed class Communication.Abstractions.Models.RetryContext : System.IEquatable<Communication.Abstractions.Models.RetryContext>
+  ctor(string OperationName, int Attempt, System.TimeSpan Elapsed, Communication.Abstractions.Models.CommunicationError Error)
+  method Communication.Abstractions.Models.RetryContext <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.RetryContext other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out string OperationName, out int Attempt, out System.TimeSpan Elapsed, out Communication.Abstractions.Models.CommunicationError Error)
+  property Communication.Abstractions.Models.CommunicationError Error { get; set; }
+  property System.TimeSpan Elapsed { get; set; }
+  property int Attempt { get; set; }
+  property string OperationName { get; set; }
+
+public struct Communication.Abstractions.Models.RetryDecision : System.IEquatable<Communication.Abstractions.Models.RetryDecision>
+  ctor(bool ShouldRetry, System.TimeSpan Delay)
+  method bool Equals(Communication.Abstractions.Models.RetryDecision other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out bool ShouldRetry, out System.TimeSpan Delay)
+  property System.TimeSpan Delay { get; set; }
+  property bool ShouldRetry { get; set; }
+  static property Communication.Abstractions.Models.RetryDecision Stop { get; }
+
+public sealed class Communication.Abstractions.Models.ServerRequestContext : System.IEquatable<Communication.Abstractions.Models.ServerRequestContext>
+  ctor(Communication.Abstractions.Models.CommunicationSession Session, Communication.Abstractions.Models.MessageEnvelope Message)
+  method Communication.Abstractions.Models.ServerRequestContext <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.ServerRequestContext other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out Communication.Abstractions.Models.CommunicationSession Session, out Communication.Abstractions.Models.MessageEnvelope Message)
+  property Communication.Abstractions.Models.CommunicationSession Session { get; set; }
+  property Communication.Abstractions.Models.MessageEnvelope Message { get; set; }
+
+public sealed class Communication.Abstractions.Models.SimulationRequest : System.IEquatable<Communication.Abstractions.Models.SimulationRequest>
+  ctor(string Protocol, string ChannelId, string SessionId, long Sequence, System.ReadOnlyMemory<byte> Payload)
+  method Communication.Abstractions.Models.SimulationRequest <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.SimulationRequest other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out string Protocol, out string ChannelId, out string SessionId, out long Sequence, out System.ReadOnlyMemory<byte> Payload)
+  property System.ReadOnlyMemory<byte> Payload { get; set; }
+  property long Sequence { get; set; }
+  property string ChannelId { get; set; }
+  property string Protocol { get; set; }
+  property string SessionId { get; set; }
+
+public sealed class Communication.Abstractions.Models.SimulationResponseDirective : System.IEquatable<Communication.Abstractions.Models.SimulationResponseDirective>
+  ctor()
+  method Communication.Abstractions.Models.SimulationResponseDirective <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.SimulationResponseDirective other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.Nullable<System.ReadOnlyMemory<byte>> ResponseOverride { get; set; }
+  property System.TimeSpan Delay { get; set; }
+  property bool CorruptResponse { get; set; }
+  property bool Disconnect { get; set; }
+  property bool DropResponse { get; set; }
+
+public sealed class Communication.Abstractions.Models.SimulatorFault : System.IEquatable<Communication.Abstractions.Models.SimulatorFault>
+  ctor(Communication.Abstractions.Models.SimulatorFaultKind Kind, int Count = 1, System.Nullable<System.TimeSpan> Delay = null, string Detail = null)
+  method Communication.Abstractions.Models.SimulatorFault <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.SimulatorFault other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out Communication.Abstractions.Models.SimulatorFaultKind Kind, out int Count, out System.Nullable<System.TimeSpan> Delay, out string Detail)
+  property Communication.Abstractions.Models.SimulatorFaultKind Kind { get; set; }
+  property System.Nullable<System.TimeSpan> Delay { get; set; }
+  property int Count { get; set; }
+  property string Detail { get; set; }
+
+public enum Communication.Abstractions.Models.SimulatorFaultKind : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.SimulatorFaultKind Delay = 0
+  static field Communication.Abstractions.Models.SimulatorFaultKind DeviceError = 4
+  static field Communication.Abstractions.Models.SimulatorFaultKind Disconnect = 2
+  static field Communication.Abstractions.Models.SimulatorFaultKind Drop = 1
+  static field Communication.Abstractions.Models.SimulatorFaultKind InvalidFrame = 3
+
+public enum Communication.Abstractions.Models.VariableAccess : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.VariableAccess None = 0
+  static field Communication.Abstractions.Models.VariableAccess Read = 1
+  static field Communication.Abstractions.Models.VariableAccess ReadWrite = 3
+  static field Communication.Abstractions.Models.VariableAccess Write = 2
+
+public sealed class Communication.Abstractions.Models.VariableDefinition : System.IEquatable<Communication.Abstractions.Models.VariableDefinition>
+  ctor(string Name, string Address, Communication.Abstractions.Models.PlcDataType DataType, int Length = 1, Communication.Abstractions.Models.VariableAccess Access = Communication.Abstractions.Models.VariableAccess.ReadWrite, double Scale = 1, string Description = null, Communication.Abstractions.Models.PlcByteOrder ByteOrder = Communication.Abstractions.Models.PlcByteOrder.BigEndian, Communication.Abstractions.Models.PlcStringEncoding StringEncoding = Communication.Abstractions.Models.PlcStringEncoding.Ascii)
+  method Communication.Abstractions.Models.VariableDefinition <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.VariableDefinition other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out string Name, out string Address, out Communication.Abstractions.Models.PlcDataType DataType, out int Length, out Communication.Abstractions.Models.VariableAccess Access, out double Scale, out string Description, out Communication.Abstractions.Models.PlcByteOrder ByteOrder, out Communication.Abstractions.Models.PlcStringEncoding StringEncoding)
+  property Communication.Abstractions.Models.PlcByteOrder ByteOrder { get; set; }
+  property Communication.Abstractions.Models.PlcDataType DataType { get; set; }
+  property Communication.Abstractions.Models.PlcStringEncoding StringEncoding { get; set; }
+  property Communication.Abstractions.Models.VariableAccess Access { get; set; }
+  property double Scale { get; set; }
+  property int Length { get; set; }
+  property string Address { get; set; }
+  property string Description { get; set; }
+  property string Name { get; set; }
+
+public sealed class Communication.Abstractions.Models.VariableMonitorOptions : System.IEquatable<Communication.Abstractions.Models.VariableMonitorOptions>
+  ctor()
+  method Communication.Abstractions.Models.VariableMonitorOptions <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.VariableMonitorOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.TimeSpan PollInterval { get; set; }
+  property bool PublishUnchangedValues { get; set; }
+  property int QueueCapacity { get; set; }
+
+public enum Communication.Abstractions.Models.VariableQuality : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.VariableQuality Bad = 2
+  static field Communication.Abstractions.Models.VariableQuality Good = 0
+  static field Communication.Abstractions.Models.VariableQuality Uncertain = 1
+
+public sealed class Communication.Abstractions.Models.VariableValue : System.IEquatable<Communication.Abstractions.Models.VariableValue>
+  ctor(Communication.Abstractions.Models.VariableDefinition Definition, object Value, Communication.Abstractions.Models.VariableQuality Quality, System.DateTimeOffset Timestamp, Communication.Abstractions.Models.CommunicationError Error = null)
+  method Communication.Abstractions.Models.VariableValue <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.VariableValue other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out Communication.Abstractions.Models.VariableDefinition Definition, out object Value, out Communication.Abstractions.Models.VariableQuality Quality, out System.DateTimeOffset Timestamp, out Communication.Abstractions.Models.CommunicationError Error)
+  property Communication.Abstractions.Models.CommunicationError Error { get; set; }
+  property Communication.Abstractions.Models.VariableDefinition Definition { get; set; }
+  property Communication.Abstractions.Models.VariableQuality Quality { get; set; }
+  property System.DateTimeOffset Timestamp { get; set; }
+  property object Value { get; set; }
+
+public sealed class Communication.Abstractions.Models.WeightReading : System.IEquatable<Communication.Abstractions.Models.WeightReading>
+  ctor(double Gross, double Net, Communication.Abstractions.Models.WeightUnit Unit, bool IsStable, System.DateTimeOffset Timestamp)
+  method Communication.Abstractions.Models.WeightReading <Clone>$()
+  method bool Equals(Communication.Abstractions.Models.WeightReading other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out double Gross, out double Net, out Communication.Abstractions.Models.WeightUnit Unit, out bool IsStable, out System.DateTimeOffset Timestamp)
+  property Communication.Abstractions.Models.WeightUnit Unit { get; set; }
+  property System.DateTimeOffset Timestamp { get; set; }
+  property bool IsStable { get; set; }
+  property double Gross { get; set; }
+  property double Net { get; set; }
+
+public sealed class Communication.Abstractions.Models.WeightReportedEventArgs : System.EventArgs
+  ctor(Communication.Abstractions.Models.WeightReading reading)
+  property Communication.Abstractions.Models.WeightReading Reading { get; }
+
+public enum Communication.Abstractions.Models.WeightUnit : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Abstractions.Models.WeightUnit Gram = 0
+  static field Communication.Abstractions.Models.WeightUnit Kilogram = 1
+  static field Communication.Abstractions.Models.WeightUnit Pound = 2
+  static field Communication.Abstractions.Models.WeightUnit Tonne = 3
+  static field Communication.Abstractions.Models.WeightUnit Unknown = 4
+

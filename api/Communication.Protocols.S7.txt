@@ -1,0 +1,89 @@
+# Public API baseline: Communication.Protocols.S7
+# Update intentionally with tools/ApiSurface --write.
+
+public static class Communication.Protocols.S7.Codecs.S7IsoOnTcpCodec
+  static method Communication.Abstractions.Models.CommunicationResult ValidateConnectionConfirmation(System.ReadOnlySpan<byte> frame)
+  static method Communication.Abstractions.Models.CommunicationResult ValidateSetupResponse(System.ReadOnlySpan<byte> frame)
+  static method Communication.Abstractions.Models.CommunicationResult ValidateWriteResponse(System.ReadOnlySpan<byte> frame)
+  static method Communication.Abstractions.Models.CommunicationResult<System.ReadOnlyMemory<byte>> DecodeReadResponse(System.ReadOnlySpan<byte> frame, int expectedBytes)
+  static method System.ReadOnlyMemory<byte> EncodeConnectionRequest(byte rack, byte slot)
+  static method System.ReadOnlyMemory<byte> EncodeReadRequest(Communication.Protocols.S7.Models.S7Address address, ushort byteCount, ushort pduReference)
+  static method System.ReadOnlyMemory<byte> EncodeSetupCommunication(ushort pduReference, ushort requestedPduLength = 480)
+  static method System.ReadOnlyMemory<byte> EncodeWriteRequest(Communication.Protocols.S7.Models.S7Address address, System.ReadOnlySpan<byte> data, ushort pduReference)
+
+public interface Communication.Protocols.S7.IS7DataAccess : System.IAsyncDisposable
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.ReadOnlyMemory<byte>>> ReadBytesAsync(Communication.Protocols.S7.Models.S7Address address, int byteCount, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteBytesAsync(Communication.Protocols.S7.Models.S7Address address, System.ReadOnlyMemory<byte> bytes, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public sealed class Communication.Protocols.S7.Models.S7Address : System.IEquatable<Communication.Protocols.S7.Models.S7Address>
+  ctor(Communication.Protocols.S7.Models.S7MemoryArea Area, ushort DbNumber, int ByteOffset, System.Nullable<int> BitOffset, string Original)
+  method Communication.Abstractions.Models.PlcAddress ToPlcAddress()
+  method Communication.Protocols.S7.Models.S7Address <Clone>$()
+  method bool Equals(Communication.Protocols.S7.Models.S7Address other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out Communication.Protocols.S7.Models.S7MemoryArea Area, out ushort DbNumber, out int ByteOffset, out System.Nullable<int> BitOffset, out string Original)
+  property Communication.Protocols.S7.Models.S7MemoryArea Area { get; set; }
+  property System.Nullable<int> BitOffset { get; set; }
+  property int BitAddress { get; }
+  property int ByteOffset { get; set; }
+  property string Original { get; set; }
+  property ushort DbNumber { get; set; }
+
+public sealed class Communication.Protocols.S7.Models.S7ClientOptions : System.IEquatable<Communication.Protocols.S7.Models.S7ClientOptions>
+  ctor()
+  method Communication.Protocols.S7.Models.S7ClientOptions <Clone>$()
+  method bool Equals(Communication.Protocols.S7.Models.S7ClientOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.TimeSpan RequestTimeout { get; set; }
+  property byte Rack { get; set; }
+  property byte Slot { get; set; }
+  property int MaxBatchBytes { get; set; }
+
+public enum Communication.Protocols.S7.Models.S7MemoryArea : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Protocols.S7.Models.S7MemoryArea DataBlock = 132
+  static field Communication.Protocols.S7.Models.S7MemoryArea Inputs = 129
+  static field Communication.Protocols.S7.Models.S7MemoryArea Markers = 131
+  static field Communication.Protocols.S7.Models.S7MemoryArea Outputs = 130
+
+public sealed class Communication.Protocols.S7.S7AddressParser : Communication.Abstractions.Interfaces.IAddressParser
+  ctor()
+  method Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.PlcAddress> Parse(string address)
+  method Communication.Abstractions.Models.CommunicationResult<Communication.Protocols.S7.Models.S7Address> ParseS7(string address)
+
+public sealed class Communication.Protocols.S7.S7IsoTcpDataAccess : Communication.Protocols.S7.IS7DataAccess, System.IAsyncDisposable
+  ctor(Communication.Abstractions.Interfaces.ITransportChannel channel, Communication.Protocols.S7.Models.S7ClientOptions options = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.ReadOnlyMemory<byte>>> ReadBytesAsync(Communication.Protocols.S7.Models.S7Address address, int byteCount, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteBytesAsync(Communication.Protocols.S7.Models.S7Address address, System.ReadOnlyMemory<byte> bytes, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public sealed class Communication.Protocols.S7.S7PlcClient : Communication.Abstractions.Interfaces.IPlcClient, System.IAsyncDisposable
+  ctor(Communication.Protocols.S7.IS7DataAccess access, Communication.Protocols.S7.Models.S7ClientOptions options = null, Communication.Protocols.S7.S7AddressParser parser = null, Communication.Abstractions.Interfaces.IValueConverter converter = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.VariableValue>> ReadAsync(Communication.Abstractions.Models.VariableDefinition variable, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteAsync(Communication.Abstractions.Models.PlcWriteRequest request, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.VariableValue>>> ReadAsync(System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.VariableDefinition> variables, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult>> WriteAsync(System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.PlcWriteRequest> requests, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public sealed class Communication.Protocols.S7.Simulator.S7MemoryDataAccess : Communication.Protocols.S7.IS7DataAccess, System.IAsyncDisposable
+  ctor()
+  method Communication.Abstractions.Models.CommunicationResult SetBytes(Communication.Protocols.S7.Models.S7Address address, System.ReadOnlySpan<byte> bytes)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.ReadOnlyMemory<byte>>> ReadBytesAsync(Communication.Protocols.S7.Models.S7Address address, int byteCount, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteBytesAsync(Communication.Protocols.S7.Models.S7Address address, System.ReadOnlyMemory<byte> bytes, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+

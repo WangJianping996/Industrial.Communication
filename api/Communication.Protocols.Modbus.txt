@@ -1,0 +1,223 @@
+# Public API baseline: Communication.Protocols.Modbus
+# Update intentionally with tools/ApiSurface --write.
+
+public sealed class Communication.Protocols.Modbus.Client.ModbusClient : System.IAsyncDisposable
+  ctor(Communication.Abstractions.Interfaces.ITransportChannel channel, Communication.Protocols.Modbus.Models.ModbusTransportMode mode, Communication.Protocols.Modbus.Models.ModbusClientOptions options = null, Communication.Abstractions.Interfaces.IRetryPolicy retryPolicy = null, Communication.Abstractions.Interfaces.IReconnectPolicy reconnectPolicy = null, Communication.Abstractions.Interfaces.IMessageMonitor monitor = null, System.Collections.Generic.IEnumerable<Communication.Abstractions.Interfaces.IConnectionRecoveryHandler> recoveryHandlers = null)
+  event System.EventHandler<Communication.Abstractions.Models.ConnectionStateChangedEventArgs> StateChanged
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Protocols.Modbus.Models.ModbusResponse>> ExecuteAsync(Communication.Protocols.Modbus.Models.ModbusRequest request, Communication.Abstractions.Models.CommunicationRequestOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.Collections.Generic.IReadOnlyList<bool>>> ReadCoilsAsync(byte unitId, ushort address, ushort quantity, Communication.Abstractions.Models.CommunicationRequestOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.Collections.Generic.IReadOnlyList<bool>>> ReadDiscreteInputsAsync(byte unitId, ushort address, ushort quantity, Communication.Abstractions.Models.CommunicationRequestOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.Collections.Generic.IReadOnlyList<ushort>>> ReadHoldingRegistersAsync(byte unitId, ushort address, ushort quantity, Communication.Abstractions.Models.CommunicationRequestOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<System.Collections.Generic.IReadOnlyList<ushort>>> ReadInputRegistersAsync(byte unitId, ushort address, ushort quantity, Communication.Abstractions.Models.CommunicationRequestOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteMultipleCoilsAsync(byte unitId, ushort address, System.Collections.Generic.IReadOnlyList<bool> values, Communication.Abstractions.Models.CommunicationRequestOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteMultipleRegistersAsync(byte unitId, ushort address, System.Collections.Generic.IReadOnlyList<ushort> values, Communication.Abstractions.Models.CommunicationRequestOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteSingleCoilAsync(byte unitId, ushort address, bool value, Communication.Abstractions.Models.CommunicationRequestOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteSingleRegisterAsync(byte unitId, ushort address, ushort value, Communication.Abstractions.Models.CommunicationRequestOptions options = null, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public sealed class Communication.Protocols.Modbus.Client.ModbusPlcAddressParser : Communication.Abstractions.Interfaces.IAddressParser
+  ctor()
+  method Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.PlcAddress> Parse(string address)
+  method Communication.Abstractions.Models.CommunicationResult<Communication.Protocols.Modbus.Models.ModbusPlcAddress> ParseModbus(string address)
+
+public sealed class Communication.Protocols.Modbus.Client.ModbusPlcClient : Communication.Abstractions.Interfaces.IPlcClient, System.IAsyncDisposable
+  ctor(Communication.Protocols.Modbus.Client.ModbusClient client, Communication.Protocols.Modbus.Models.ModbusPlcClientOptions options = null, Communication.Protocols.Modbus.Client.ModbusPlcAddressParser parser = null, Communication.Abstractions.Interfaces.IValueConverter converter = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.VariableValue>> ReadAsync(Communication.Abstractions.Models.VariableDefinition variable, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> WriteAsync(Communication.Abstractions.Models.PlcWriteRequest request, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult<Communication.Abstractions.Models.VariableValue>>> ReadAsync(System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.VariableDefinition> variables, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.CommunicationResult>> WriteAsync(System.Collections.Generic.IReadOnlyList<Communication.Abstractions.Models.PlcWriteRequest> requests, System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+
+public static class Communication.Protocols.Modbus.Codecs.ModbusPduCodec
+  static method Communication.Abstractions.Models.CommunicationResult<Communication.Protocols.Modbus.Models.ModbusRequest> DecodeRequest(System.ReadOnlySpan<byte> pdu, ushort transactionId, byte unitId)
+  static method Communication.Abstractions.Models.CommunicationResult<Communication.Protocols.Modbus.Models.ModbusResponse> DecodeResponse(System.ReadOnlySpan<byte> pdu, ushort transactionId, byte unitId)
+  static method Communication.Abstractions.Models.CommunicationResult<System.ReadOnlyMemory<byte>> EncodeRequest(Communication.Protocols.Modbus.Models.ModbusRequest request)
+  static method Communication.Abstractions.Models.CommunicationResult<System.ReadOnlyMemory<byte>> EncodeResponse(Communication.Protocols.Modbus.Models.ModbusResponse response)
+
+public sealed class Communication.Protocols.Modbus.Codecs.ModbusRtuCodec : Communication.Abstractions.Interfaces.IProtocolCodec<Communication.Protocols.Modbus.Models.ModbusRequest, Communication.Protocols.Modbus.Models.ModbusResponse>
+  ctor()
+  method Communication.Abstractions.Interfaces.ProtocolDecodeResult<Communication.Protocols.Modbus.Models.ModbusResponse> TryDecode(System.Buffers.ReadOnlySequence<byte> buffer)
+  method System.ReadOnlyMemory<byte> Encode(Communication.Protocols.Modbus.Models.ModbusRequest request)
+
+public static class Communication.Protocols.Modbus.Codecs.ModbusRtuFrameCodec
+  static method Communication.Abstractions.Interfaces.ProtocolDecodeResult<Communication.Protocols.Modbus.Models.ModbusRequest> TryDecodeRequest(System.Buffers.ReadOnlySequence<byte> buffer)
+  static method Communication.Abstractions.Interfaces.ProtocolDecodeResult<Communication.Protocols.Modbus.Models.ModbusResponse> TryDecodeResponse(System.Buffers.ReadOnlySequence<byte> buffer)
+  static method System.ReadOnlyMemory<byte> EncodeRequest(Communication.Protocols.Modbus.Models.ModbusRequest request)
+  static method System.ReadOnlyMemory<byte> EncodeResponse(Communication.Protocols.Modbus.Models.ModbusResponse response)
+
+public static class Communication.Protocols.Modbus.Codecs.ModbusRtuTiming
+  static method System.TimeSpan GetInterCharacterDelay(int baudRate, int dataBits = 8, bool hasParity = false, double stopBits = 1)
+  static method System.TimeSpan GetInterFrameDelay(int baudRate, int dataBits = 8, bool hasParity = false, double stopBits = 1)
+
+public sealed class Communication.Protocols.Modbus.Codecs.ModbusTcpCodec : Communication.Abstractions.Interfaces.IProtocolCodec<Communication.Protocols.Modbus.Models.ModbusRequest, Communication.Protocols.Modbus.Models.ModbusResponse>
+  ctor()
+  method Communication.Abstractions.Interfaces.ProtocolDecodeResult<Communication.Protocols.Modbus.Models.ModbusResponse> TryDecode(System.Buffers.ReadOnlySequence<byte> buffer)
+  method System.ReadOnlyMemory<byte> Encode(Communication.Protocols.Modbus.Models.ModbusRequest request)
+
+public static class Communication.Protocols.Modbus.Codecs.ModbusTcpFrameCodec
+  static method Communication.Abstractions.Interfaces.ProtocolDecodeResult<Communication.Protocols.Modbus.Models.ModbusRequest> TryDecodeRequest(System.Buffers.ReadOnlySequence<byte> buffer)
+  static method Communication.Abstractions.Interfaces.ProtocolDecodeResult<Communication.Protocols.Modbus.Models.ModbusResponse> TryDecodeResponse(System.Buffers.ReadOnlySequence<byte> buffer)
+  static method System.ReadOnlyMemory<byte> EncodeRequest(Communication.Protocols.Modbus.Models.ModbusRequest request)
+  static method System.ReadOnlyMemory<byte> EncodeResponse(Communication.Protocols.Modbus.Models.ModbusResponse response)
+
+public sealed class Communication.Protocols.Modbus.Models.ModbusClientOptions : System.IEquatable<Communication.Protocols.Modbus.Models.ModbusClientOptions>
+  ctor()
+  method Communication.Protocols.Modbus.Models.ModbusClientOptions <Clone>$()
+  method bool Equals(Communication.Protocols.Modbus.Models.ModbusClientOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property System.TimeSpan DefaultTimeout { get; set; }
+  property System.TimeSpan RtuInterFrameDelay { get; set; }
+  property int MaxBufferedBytes { get; set; }
+  property int MaxTcpInFlight { get; set; }
+
+public enum Communication.Protocols.Modbus.Models.ModbusDataArea : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Protocols.Modbus.Models.ModbusDataArea Coils = 0
+  static field Communication.Protocols.Modbus.Models.ModbusDataArea DiscreteInputs = 1
+  static field Communication.Protocols.Modbus.Models.ModbusDataArea HoldingRegisters = 2
+  static field Communication.Protocols.Modbus.Models.ModbusDataArea InputRegisters = 3
+
+public enum Communication.Protocols.Modbus.Models.ModbusExceptionCode : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Protocols.Modbus.Models.ModbusExceptionCode Acknowledge = 5
+  static field Communication.Protocols.Modbus.Models.ModbusExceptionCode GatewayPathUnavailable = 10
+  static field Communication.Protocols.Modbus.Models.ModbusExceptionCode GatewayTargetFailedToRespond = 11
+  static field Communication.Protocols.Modbus.Models.ModbusExceptionCode IllegalDataAddress = 2
+  static field Communication.Protocols.Modbus.Models.ModbusExceptionCode IllegalDataValue = 3
+  static field Communication.Protocols.Modbus.Models.ModbusExceptionCode IllegalFunction = 1
+  static field Communication.Protocols.Modbus.Models.ModbusExceptionCode ServerDeviceBusy = 6
+  static field Communication.Protocols.Modbus.Models.ModbusExceptionCode ServerDeviceFailure = 4
+
+public enum Communication.Protocols.Modbus.Models.ModbusFunctionCode : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Protocols.Modbus.Models.ModbusFunctionCode ReadCoils = 1
+  static field Communication.Protocols.Modbus.Models.ModbusFunctionCode ReadDiscreteInputs = 2
+  static field Communication.Protocols.Modbus.Models.ModbusFunctionCode ReadHoldingRegisters = 3
+  static field Communication.Protocols.Modbus.Models.ModbusFunctionCode ReadInputRegisters = 4
+  static field Communication.Protocols.Modbus.Models.ModbusFunctionCode WriteMultipleCoils = 15
+  static field Communication.Protocols.Modbus.Models.ModbusFunctionCode WriteMultipleRegisters = 16
+  static field Communication.Protocols.Modbus.Models.ModbusFunctionCode WriteSingleCoil = 5
+  static field Communication.Protocols.Modbus.Models.ModbusFunctionCode WriteSingleRegister = 6
+
+public static class Communication.Protocols.Modbus.Models.ModbusLimits
+  static field int MaxPduLength = 253
+  static field ushort MaxReadBits = 2000
+  static field ushort MaxReadRegisters = 125
+  static field ushort MaxWriteCoils = 1968
+  static field ushort MaxWriteRegisters = 123
+
+public sealed class Communication.Protocols.Modbus.Models.ModbusPlcAddress : System.IEquatable<Communication.Protocols.Modbus.Models.ModbusPlcAddress>
+  ctor(Communication.Protocols.Modbus.Models.ModbusDataArea Area, ushort Offset, string Original)
+  method Communication.Protocols.Modbus.Models.ModbusPlcAddress <Clone>$()
+  method bool Equals(Communication.Protocols.Modbus.Models.ModbusPlcAddress other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out Communication.Protocols.Modbus.Models.ModbusDataArea Area, out ushort Offset, out string Original)
+  property Communication.Protocols.Modbus.Models.ModbusDataArea Area { get; set; }
+  property string Original { get; set; }
+  property ushort Offset { get; set; }
+
+public sealed class Communication.Protocols.Modbus.Models.ModbusPlcClientOptions : System.IEquatable<Communication.Protocols.Modbus.Models.ModbusPlcClientOptions>
+  ctor()
+  method Communication.Protocols.Modbus.Models.ModbusPlcClientOptions <Clone>$()
+  method bool Equals(Communication.Protocols.Modbus.Models.ModbusPlcClientOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property byte UnitId { get; set; }
+  property int MaxReadBits { get; set; }
+  property int MaxReadRegisters { get; set; }
+
+public sealed class Communication.Protocols.Modbus.Models.ModbusRequest : System.IEquatable<Communication.Protocols.Modbus.Models.ModbusRequest>
+  ctor(ushort TransactionId, byte UnitId, Communication.Protocols.Modbus.Models.ModbusFunctionCode FunctionCode, ushort Address, ushort Quantity, System.ReadOnlyMemory<byte> Data)
+  method Communication.Protocols.Modbus.Models.ModbusRequest <Clone>$()
+  method bool Equals(Communication.Protocols.Modbus.Models.ModbusRequest other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out ushort TransactionId, out byte UnitId, out Communication.Protocols.Modbus.Models.ModbusFunctionCode FunctionCode, out ushort Address, out ushort Quantity, out System.ReadOnlyMemory<byte> Data)
+  property Communication.Protocols.Modbus.Models.ModbusFunctionCode FunctionCode { get; set; }
+  property System.ReadOnlyMemory<byte> Data { get; set; }
+  property byte UnitId { get; set; }
+  property ushort Address { get; set; }
+  property ushort Quantity { get; set; }
+  property ushort TransactionId { get; set; }
+  static method Communication.Protocols.Modbus.Models.ModbusRequest Read(byte unitId, Communication.Protocols.Modbus.Models.ModbusFunctionCode functionCode, ushort address, ushort quantity)
+  static method Communication.Protocols.Modbus.Models.ModbusRequest WriteCoil(byte unitId, ushort address, bool value)
+  static method Communication.Protocols.Modbus.Models.ModbusRequest WriteCoils(byte unitId, ushort address, System.Collections.Generic.IReadOnlyList<bool> values)
+  static method Communication.Protocols.Modbus.Models.ModbusRequest WriteRegister(byte unitId, ushort address, ushort value)
+  static method Communication.Protocols.Modbus.Models.ModbusRequest WriteRegisters(byte unitId, ushort address, System.Collections.Generic.IReadOnlyList<ushort> values)
+
+public sealed class Communication.Protocols.Modbus.Models.ModbusResponse : System.IEquatable<Communication.Protocols.Modbus.Models.ModbusResponse>
+  ctor(ushort TransactionId, byte UnitId, Communication.Protocols.Modbus.Models.ModbusFunctionCode FunctionCode, System.ReadOnlyMemory<byte> Data, System.Nullable<Communication.Protocols.Modbus.Models.ModbusExceptionCode> ExceptionCode = null)
+  method Communication.Abstractions.Models.CommunicationError ToCommunicationError()
+  method Communication.Protocols.Modbus.Models.ModbusResponse <Clone>$()
+  method bool Equals(Communication.Protocols.Modbus.Models.ModbusResponse other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  method void Deconstruct(out ushort TransactionId, out byte UnitId, out Communication.Protocols.Modbus.Models.ModbusFunctionCode FunctionCode, out System.ReadOnlyMemory<byte> Data, out System.Nullable<Communication.Protocols.Modbus.Models.ModbusExceptionCode> ExceptionCode)
+  property Communication.Protocols.Modbus.Models.ModbusFunctionCode FunctionCode { get; set; }
+  property System.Nullable<Communication.Protocols.Modbus.Models.ModbusExceptionCode> ExceptionCode { get; set; }
+  property System.ReadOnlyMemory<byte> Data { get; set; }
+  property bool IsException { get; }
+  property byte UnitId { get; set; }
+  property ushort TransactionId { get; set; }
+
+public enum Communication.Protocols.Modbus.Models.ModbusTransportMode : System.IComparable, System.IConvertible, System.IFormattable, System.ISpanFormattable
+  static field Communication.Protocols.Modbus.Models.ModbusTransportMode Rtu = 1
+  static field Communication.Protocols.Modbus.Models.ModbusTransportMode Tcp = 0
+
+public sealed class Communication.Protocols.Modbus.Simulator.ModbusDataStore
+  ctor()
+  method Communication.Abstractions.Models.CommunicationResult SetBits(Communication.Protocols.Modbus.Models.ModbusDataArea area, ushort address, System.Collections.Generic.IReadOnlyList<bool> values)
+  method Communication.Abstractions.Models.CommunicationResult SetRegisters(Communication.Protocols.Modbus.Models.ModbusDataArea area, ushort address, System.Collections.Generic.IReadOnlyList<ushort> values)
+  method Communication.Abstractions.Models.CommunicationResult<System.Collections.Generic.IReadOnlyList<bool>> ReadBits(Communication.Protocols.Modbus.Models.ModbusDataArea area, ushort address, ushort quantity)
+  method Communication.Abstractions.Models.CommunicationResult<System.Collections.Generic.IReadOnlyList<ushort>> ReadRegisters(Communication.Protocols.Modbus.Models.ModbusDataArea area, ushort address, ushort quantity)
+
+public sealed class Communication.Protocols.Modbus.Simulator.ModbusSimulatorChannel : Communication.Abstractions.Interfaces.ITransportChannel, System.IAsyncDisposable
+  ctor(Communication.Protocols.Modbus.Models.ModbusTransportMode mode, Communication.Protocols.Modbus.Simulator.ModbusSlave slave = null, Communication.Protocols.Modbus.Simulator.ModbusSimulatorOptions options = null, string channelId = null)
+  event System.EventHandler<Communication.Abstractions.Models.ConnectionStateChangedEventArgs> StateChanged
+  method System.Collections.Generic.IAsyncEnumerable<System.ReadOnlyMemory<byte>> ReceiveAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult<int>> SendAsync(System.ReadOnlyMemory<byte> payload, System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> ConnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> DisconnectAsync(System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+  property string ChannelId { get; }
+
+public sealed class Communication.Protocols.Modbus.Simulator.ModbusSimulatorOptions : System.IEquatable<Communication.Protocols.Modbus.Simulator.ModbusSimulatorOptions>
+  ctor()
+  method Communication.Protocols.Modbus.Simulator.ModbusSimulatorOptions <Clone>$()
+  method bool Equals(Communication.Protocols.Modbus.Simulator.ModbusSimulatorOptions other)
+  method bool Equals(object obj)
+  method int GetHashCode()
+  method string ToString()
+  property Communication.Abstractions.Interfaces.ISimulationResponseScript Script { get; set; }
+  property System.Nullable<Communication.Protocols.Modbus.Models.ModbusExceptionCode> ForcedException { get; set; }
+  property System.TimeSpan ResponseDelay { get; set; }
+  property bool CorruptRtuCrc { get; set; }
+  property bool DisconnectOnRequest { get; set; }
+  property bool DropResponses { get; set; }
+
+public sealed class Communication.Protocols.Modbus.Simulator.ModbusSlave
+  ctor(byte unitId = 1, Communication.Protocols.Modbus.Simulator.ModbusDataStore dataStore = null)
+  method Communication.Protocols.Modbus.Models.ModbusResponse ProcessRequest(Communication.Protocols.Modbus.Models.ModbusRequest request)
+  property Communication.Protocols.Modbus.Simulator.ModbusDataStore DataStore { get; }
+  property byte UnitId { get; }
+
+public sealed class Communication.Protocols.Modbus.Simulator.ModbusTcpSimulatorServer : System.IAsyncDisposable
+  ctor(Communication.Transports.Options.TcpServerOptions transportOptions, Communication.Protocols.Modbus.Simulator.ModbusSlave slave = null, Communication.Protocols.Modbus.Simulator.ModbusSimulatorOptions options = null)
+  method System.Threading.Tasks.ValueTask DisposeAsync()
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StartAsync(System.Threading.CancellationToken cancellationToken = null)
+  method System.Threading.Tasks.ValueTask<Communication.Abstractions.Models.CommunicationResult> StopAsync(System.Threading.CancellationToken cancellationToken = null)
+  property Communication.Abstractions.Models.ConnectionState State { get; }
+  property Communication.Protocols.Modbus.Simulator.ModbusDataStore DataStore { get; }
+  property int BoundPort { get; }
+
