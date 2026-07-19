@@ -1,6 +1,6 @@
 # PLC 变量、S7 与 MC 快速入门
 
-第五天交付统一的 `IPlcClient`、`VariableDefinition`、`PlcValueConverter` 和 `VariableMonitor`。Modbus、Siemens S7 和 Mitsubishi MC 的变量客户端使用同一套读取、写入、批量结果、质量码与时间戳模型。
+统一的 `IPlcClient`、`VariableDefinition`、`PlcValueConverter` 和 `VariableMonitor` 为 Modbus、Siemens S7 和 Mitsubishi MC 客户端提供一致的读取、写入、批量结果、质量码与时间戳模型。
 
 所有发布类库只目标化 `netstandard2.1`；示例和测试的 `net10.0` 仅作为宿主，不进入 NuGet 包。
 

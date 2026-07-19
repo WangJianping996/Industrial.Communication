@@ -1,6 +1,6 @@
 # OPC UA 与通用设备适配器
 
-第六天交付包含独立 OPC UA NuGet 包和不依赖厂商 SDK 的设备契约。所有发布类库只生成 `netstandard2.1` 资产；示例和测试使用 `net10.0`。
+本模块包含独立 OPC UA NuGet 包和不依赖厂商 SDK 的设备契约。所有发布类库只生成 `netstandard2.1` 资产；示例和测试使用 `net10.0`。
 
 ## OPC UA 快速开始
 

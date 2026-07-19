@@ -75,7 +75,7 @@ Disconnected → Connecting → Connected → Reconnecting
 
 - 程序集和命名空间：`Communication.*`
 - NuGet 包 ID：`Industrial.Communication.*`
-- 初始版本：`0.1.0-preview.1`
+- 初始版本：`0.1.0`
 - 版本规则：SemVer；预览期允许基于变更日志调整 API，`1.0.0` 后破坏性变更只进入主版本。
 - 许可证：项目自身采用 MIT。
 

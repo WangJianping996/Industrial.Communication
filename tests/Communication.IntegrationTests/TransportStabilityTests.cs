@@ -5,7 +5,7 @@ using Communication.Transports.Tcp;
 
 namespace Communication.IntegrationTests;
 
-public sealed class Day7TransportStabilityTests
+public sealed class TransportStabilityTests
 {
     [Fact]
     public async Task Concurrent_connect_disconnect_race_is_serialized_and_releases_server_sessions()

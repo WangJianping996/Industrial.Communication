@@ -7,7 +7,7 @@ using Communication.Core.Reliability;
 
 namespace Communication.UnitTests;
 
-public sealed class Day7StabilityTests
+public sealed class StabilityTests
 {
     [Fact]
     public async Task Bounded_queue_survives_sustained_concurrent_producers_without_loss_or_leak()

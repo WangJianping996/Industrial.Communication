@@ -2,6 +2,14 @@
 
 All notable changes to this project are documented here. The project follows Semantic Versioning once the public API reaches a stable release.
 
+## 0.1.0 - 2026-07-19
+
+First stable release:
+
+- Published the supported communication libraries as stable NuGet packages.
+- Finalized package metadata and consumer-facing documentation.
+- Retained the validated public API, protocol implementations, Source Link and symbol packages from the preview release.
+
 ## 0.1.0-preview.1 - 2026-07-19
 
 First installable preview:

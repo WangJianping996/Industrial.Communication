@@ -21,7 +21,7 @@
 ```powershell
 dotnet new console -n IndustrialDemo -f net10.0
 cd IndustrialDemo
-dotnet add package Industrial.Communication.Protocols.Modbus --version 0.1.0-preview.1
+dotnet add package Industrial.Communication.Protocols.Modbus --version 0.1.0
 ```
 
 TCP 通道和 Modbus 客户端拥有异步生命周期，调用方应使用 `await using`：

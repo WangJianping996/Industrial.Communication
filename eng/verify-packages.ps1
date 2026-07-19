@@ -3,7 +3,7 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$PackageDirectory,
 
-    [string]$ExpectedVersion = '0.1.0-preview.1',
+    [string]$ExpectedVersion = '0.1.0',
 
     [string]$ExpectedRepositoryUrl = ''
 )

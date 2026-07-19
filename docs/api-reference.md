@@ -2,7 +2,7 @@
 
 每个发布包都包含对应程序集的 XML 文档，IDE 安装 NuGet 包后可直接显示摘要、参数和返回值说明。Nullable 已启用，Release 构建将缺少公开 XML 文档的 `CS1591` 视为错误。
 
-`api/Communication.*.txt` 是 `0.1.0-preview.1` 的公开 API 基线。CI 在 Release 构建后运行：
+`api/Communication.*.txt` 是 `0.1.0` 的公开 API 基线。CI 在 Release 构建后运行：
 
 ```powershell
 dotnet run --project tools/ApiSurface -- --verify
