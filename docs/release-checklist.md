@@ -16,8 +16,8 @@
 - [x] NuGet.org Trusted Publishing 策略已绑定 `WangJianping996/Industrial.Communication` 的 `ci.yml`。
 - [x] GitHub Actions 发布作业具有 `id-token: write` 权限并使用短期凭据。
 - [x] 9 个包 ID 均归 NuGet.org 用户 `WJP` 管理。
-- [ ] 创建并推送 `v0.1.1` 标签。
-- [ ] 确认 GitHub Actions 的构建、测试、打包和发布作业全部成功。
-- [ ] 从 NuGet.org 公共源核对 9 个 `0.1.1` 包的作者、README、图标、依赖和符号。
+- [x] 创建并推送 `v0.1.1` 标签。
+- [x] 确认 GitHub Actions 的构建、测试、打包和发布作业全部成功。
+- [x] 从 NuGet.org 公共源核对 9 个 `0.1.1` 包的作者、README、图标、依赖和符号。
 
 发布后的功能边界和生产注意事项以 [支持矩阵](supported-features.md)、[安全说明](security.md) 和各协议指南为准。
