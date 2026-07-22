@@ -2,6 +2,13 @@
 
 All notable changes to this project are documented here. The project follows Semantic Versioning once the public API reaches a stable release.
 
+## 0.1.1 - 2026-07-23
+
+Package metadata correction:
+
+- Changed the NuGet author, company and copyright owner to `WJP`.
+- No runtime behavior or public API changes.
+
 ## 0.1.0 - 2026-07-19
 
 First stable release:

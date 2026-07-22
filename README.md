@@ -5,7 +5,7 @@
 ## 安装
 
 ```powershell
-dotnet add package Industrial.Communication.Protocols.Modbus --version 0.1.0
+dotnet add package Industrial.Communication.Protocols.Modbus --version 0.1.1
 ```
 
 按需安装对应组件包：

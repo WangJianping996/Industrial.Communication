@@ -14,15 +14,15 @@
     <RepositoryUrl>https://github.com/WangJianping996/Industrial.Communication</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageProjectUrl>https://github.com/WangJianping996/Industrial.Communication</PackageProjectUrl>
-    <Version>0.1.0</Version>
-    <Authors>Industrial Communication Contributors</Authors>
-    <Company>Industrial Communication Contributors</Company>
-    <Copyright>Copyright © Industrial Communication Contributors</Copyright>
+    <Version>0.1.1</Version>
+    <Authors>WJP</Authors>
+    <Company>WJP</Company>
+    <Copyright>Copyright © WJP</Copyright>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageTags>industrial;communication;plc;modbus;opcua;s7;mitsubishi</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageIcon>package-icon.png</PackageIcon>
-    <PackageReleaseNotes>First stable release. See CHANGELOG.md for details.</PackageReleaseNotes>
+    <PackageReleaseNotes>Correct package author metadata to WJP. No API changes.</PackageReleaseNotes>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
